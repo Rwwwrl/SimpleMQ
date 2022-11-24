@@ -1,8 +1,11 @@
 import socket
 import uuid
 import json
+import logging
 
 from connection_config import ConnectionConfig
+
+logger = logging.getLogger('root')
 
 
 class BaseFollower:
@@ -22,19 +25,20 @@ class BaseFollower:
         self.sock.send(ping_message_to_start)
 
         self._connected = True
+        logger.debug(f'follower {self._uid} connected')
 
     def _close_connect(self) -> None:
         self.sock.close()
         self._connected = False
+        logger.debug(f'follower {self._uid} disconnected')
 
     def messages(self) -> None:
         while True:
             data = self.sock.recv(1024)
             message = data.decode('utf-8')  # TODO
-            yield message
-
-    def __iter__(self):
-        return self.messages()
+            if message:
+                logger.debug('message received')
+                yield message
 
 
 class Follower(BaseFollower):
