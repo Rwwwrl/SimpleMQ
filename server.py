@@ -8,8 +8,9 @@ from asyncio.base_events import Server
 from asyncio.streams import StreamReader, StreamWriter
 from asyncio.trsock import TransportSocket
 
-from collections import deque
-import json
+from .message_deserializer import message_deserializer
+from .message.message import PossibleSenderTypes
+from .request_message_convert_to_server_message import request_message_convert_to_server_message
 
 logger = logging.getLogger('root')
 
@@ -21,7 +22,7 @@ async def start_callback(reader: StreamReader, writer: StreamWriter):
     while True:
 
         try:
-            request_message = (await reader.read(255)).decode('utf-8')
+            request_message = (await reader.read(255))
         except ConnectionResetError:
             break
 
@@ -29,23 +30,26 @@ async def start_callback(reader: StreamReader, writer: StreamWriter):
             break
 
         try:
-            deserialized_message = json.loads(request_message)
+            message = message_deserializer(message=request_message)
         except Exception:
             logger.exception(f'request_message should be deserialible, received: "{request_message}"')
             continue
 
-        if deserialized_message['type'] == 'follower':
+        logger.debug(f'message received from {type(message)}')
+        if message.sender_type == PossibleSenderTypes.FOLLOWER:
             if not writer in FOLLOWERS:
                 logger.debug('new follower was added')
                 FOLLOWERS.append(writer)
 
-        if deserialized_message['type'] == 'publisher':
+        if message.sender_type == PossibleSenderTypes.PUBLISHER:
+            message_from_server = request_message_convert_to_server_message(message=message)
             for follower in FOLLOWERS:
                 try:
-                    follower.write(deserialized_message['data'].encode('utf-8'))
+                    follower.write(message_from_server.as_bytes)
                     await writer.drain()
                     logger.debug(f'message to {follower} were delived')
                 except Exception:
+                    logger.exception('some exception')
                     continue
 
     writer.close()

@@ -1,0 +1,53 @@
+from .message import (
+    MessageFromFollower,
+    MessageFromPublisher,
+    MessageFromServer,
+    PossibleRequestTypes,
+    PossibleRequestTypesFromFollower,
+    PossibleRequestTypesFromPublisher,
+)
+from ..global_typing import MemberName, MessageText
+
+
+class MessageFromFollowerFactory:
+    def __init__(self, unique_sender_name: MemberName):
+        self._unique_sender_name = unique_sender_name
+
+    def create_send_message(self, message_text: MessageText) -> MessageFromFollower:
+        return MessageFromFollower(
+            message_text=message_text,
+            request_type=PossibleRequestTypesFromFollower.NEW_MESSAGE,
+            sender_unique_name=self._unique_sender_name,
+        )
+
+    def create_ping_to_connect_message(self) -> MessageFromFollower:
+        return MessageFromFollower(
+            message_text='',
+            request_type=PossibleRequestTypesFromFollower.PING_TO_CONNECT,
+            sender_unique_name=self._unique_sender_name,
+        )
+
+    def create_ping_to_disconnect_message(self) -> MessageFromFollower:
+        return MessageFromFollower(
+            message_text='',
+            request_type=PossibleRequestTypesFromFollower.PING_TO_DISCONNECT,
+            sender_unique_name=self._unique_sender_name,
+        )
+
+
+class MessageFromPublisherFactory:
+    def __init__(self, unique_sender_name: MemberName):
+        self._unique_sender_name = unique_sender_name
+
+    def create_send_message(self, message_text: MessageText) -> MessageFromPublisher:
+        return MessageFromPublisher(
+            message_text=message_text,
+            request_type=PossibleRequestTypesFromPublisher.NEW_MESSAGE,
+            sender_unique_name=self._unique_sender_name,
+        )
+
+
+class MessageFromServerFactory:
+    @staticmethod
+    def create_send_message(message_text: MessageText) -> MessageFromServer:
+        return MessageFromServer(message_text=message_text)
