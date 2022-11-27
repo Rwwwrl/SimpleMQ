@@ -1,18 +1,13 @@
 from typing import List
 import asyncio
-
-import logging
-
-# annotations
 from asyncio.base_events import Server
 from asyncio.streams import StreamReader, StreamWriter
-from asyncio.trsock import TransportSocket
 
 from .message_deserializer import message_deserializer
 from .message.message import PossibleSenderTypes
 from .request_message_convert_to_server_message import request_message_convert_to_server_message
+from .logger_conf import logger
 
-logger = logging.getLogger('root')
 
 FOLLOWERS: List[StreamWriter] = []
 
@@ -66,9 +61,5 @@ async def run_server():
         limit=4,
     )
     async with server:
-        logging.debug(f'server was started at {HOST}:{PORT}')
+        logger.debug(f'server was started at {HOST}:{PORT}')
         await server.serve_forever()
-
-
-if __name__ == '__main__':
-    asyncio.run(run_server())

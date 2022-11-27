@@ -1,15 +1,13 @@
 import socket
-import logging
 from typing import Optional, Iterator
 
-from connection_config import ConnectionConfig
+from ..connection_config import ConnectionConfig
 from ..member import Member
 from ..global_typing import MemberName
 from ..message.message_factory import MessageFromFollowerFactory
 from ..message.message import MessageFromServer
 from ..message_deserializer import message_deserializer
-
-logger = logging.getLogger('root')
+from ..logger_conf import logger
 
 
 class BaseFollower(Member):

@@ -2,7 +2,6 @@ from .message import (
     MessageFromFollower,
     MessageFromPublisher,
     MessageFromServer,
-    PossibleRequestTypes,
     PossibleRequestTypesFromFollower,
     PossibleRequestTypesFromPublisher,
 )

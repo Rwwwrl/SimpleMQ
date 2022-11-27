@@ -4,12 +4,8 @@ from typing import Optional
 from ..connection_config import ConnectionConfig
 from ..global_typing import MessageText, MemberName
 from ..member import Member
-
+from ..logger_conf import logger
 from ..message.message_factory import MessageFromPublisherFactory
-
-import logging
-
-logger = logging.getLogger('root')
 
 
 class IPublisher:
