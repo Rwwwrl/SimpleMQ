@@ -5,14 +5,14 @@ from .message import (
     PossibleRequestTypesFromFollower,
     PossibleRequestTypesFromPublisher,
 )
-from ..global_typing import MemberName, MessageText
+from ..hints import MemberName, MessageData
 
 
 class MessageFromFollowerFactory:
     def __init__(self, unique_sender_name: MemberName):
         self._unique_sender_name = unique_sender_name
 
-    def create_send_message(self, message_text: MessageText) -> MessageFromFollower:
+    def create_send_message(self, message_text: MessageData) -> MessageFromFollower:
         return MessageFromFollower(
             message_text=message_text,
             request_type=PossibleRequestTypesFromFollower.NEW_MESSAGE,
@@ -38,7 +38,7 @@ class MessageFromPublisherFactory:
     def __init__(self, unique_sender_name: MemberName):
         self._unique_sender_name = unique_sender_name
 
-    def create_send_message(self, message_text: MessageText) -> MessageFromPublisher:
+    def create_send_message(self, message_text: MessageData) -> MessageFromPublisher:
         return MessageFromPublisher(
             message_text=message_text,
             request_type=PossibleRequestTypesFromPublisher.NEW_MESSAGE,
@@ -48,5 +48,5 @@ class MessageFromPublisherFactory:
 
 class MessageFromServerFactory:
     @staticmethod
-    def create_send_message(message_text: MessageText) -> MessageFromServer:
+    def create_send_message(message_text: MessageData) -> MessageFromServer:
         return MessageFromServer(message_text=message_text)

@@ -1,5 +1,4 @@
 from logging import config
-import logging
 
 LOGGING_CONFIG = {
     'version': 1,
@@ -25,6 +24,3 @@ LOGGING_CONFIG = {
 }
 
 config.dictConfig(LOGGING_CONFIG)
-
-logger = logging.getLogger('root')
-

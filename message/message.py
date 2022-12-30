@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Union
 
-from ..global_typing import MessageText, MemberName
-from ..mixins.forwarded_object import ForwardedObjectMixin
-from ..static_funcs.dataclass_to_bytes import dataclass_to_bytes
+from ..hints import MessageData, MemberName
+from ..mixins.forwarded_object import ForwardedObject
+from ..utils.static_funcs.dataclass_to_bytes import dataclass_to_bytes
 
 
 class PossibleSenderTypes(Enum):
@@ -35,7 +35,7 @@ class BaseMessage:
     sender_type: PossibleSenderTypes
     sender_unique_name: MemberName
     request_type: PossibleRequestTypes
-    message_text: MessageText
+    message_text: MessageData
 
     @property
     def as_bytes(self) -> bytes:
@@ -43,7 +43,7 @@ class BaseMessage:
 
 
 @dataclass(kw_only=True)
-class MessageFromFollower(BaseMessage, ForwardedObjectMixin):
+class MessageFromFollower(BaseMessage, ForwardedObject):
 
     sender_type: PossibleSenderTypes = PossibleSenderTypes.FOLLOWER
 
@@ -53,10 +53,10 @@ class MessageFromFollower(BaseMessage, ForwardedObjectMixin):
 
 
 @dataclass(kw_only=True)
-class MessageFromServer(ForwardedObjectMixin):
+class MessageFromServer(ForwardedObject):
 
     sender_type: PossibleSenderTypes = PossibleSenderTypes.SERVER
-    message_text: MessageText
+    message_text: MessageData
 
     @property
     def as_bytes(self) -> bytes:
@@ -64,6 +64,6 @@ class MessageFromServer(ForwardedObjectMixin):
 
 
 @dataclass(kw_only=True)
-class MessageFromPublisher(BaseMessage, ForwardedObjectMixin):
+class MessageFromPublisher(BaseMessage, ForwardedObject):
 
     sender_type: PossibleSenderTypes = PossibleSenderTypes.PUBLISHER

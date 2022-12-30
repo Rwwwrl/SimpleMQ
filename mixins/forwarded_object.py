@@ -1,4 +1,7 @@
-class ForwardedObjectMixin:
-    @property
+import abc
+
+
+class ForwardedObject(abc.ABC):
+    @abc.abstractproperty
     def as_bytes(self) -> bytes:
-        raise NotImplementedError
+        pass
