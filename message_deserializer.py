@@ -9,14 +9,14 @@ def message_deserializer(message: bytes) -> Union[MessageFromFollower, MessageFr
 
     if message_as_json['sender_type'] == PossibleSenderTypes.FOLLOWER.value:
         return MessageFromFollower(
-            sender_unique_name=message_as_json['sender_unique_name'],
+            sender_member_name=message_as_json['sender_member_name'],
             request_type=message_as_json['request_type'],
             message_text=message_as_json['message_text'],
         )
 
     if message_as_json['sender_type'] == PossibleSenderTypes.PUBLISHER.value:
         return MessageFromPublisher(
-            sender_unique_name=message_as_json['sender_unique_name'],
+            sender_member_name=message_as_json['sender_member_name'],
             request_type=message_as_json['request_type'],
             message_text=message_as_json['message_text'],
         )

@@ -33,7 +33,7 @@ PossibleRequestTypes = Union[PossibleRequestTypesFromFollower, PossibleRequestTy
 class BaseMessage:
 
     sender_type: PossibleSenderTypes
-    sender_unique_name: MemberName
+    sender_member_name: MemberName
     request_type: PossibleRequestTypes
     message_text: MessageData
 
@@ -53,7 +53,7 @@ class MessageFromFollower(BaseMessage, ForwardedObject):
 
 
 @dataclass(kw_only=True)
-class MessageFromServer(ForwardedObject):
+class MessageFromServer(ForwardedObject):  # TODO надо логически обьяснить почему это не унаследовано от BaseMessage
 
     sender_type: PossibleSenderTypes = PossibleSenderTypes.SERVER
     message_text: MessageData

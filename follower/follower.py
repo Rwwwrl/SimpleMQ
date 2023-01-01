@@ -58,12 +58,11 @@ class BaseFollower(BaseMember, IFollower):
         self.socket.send_message(ping_to_connect_message.as_bytes)
 
         self.is_connected = True
-        logger.debug(f'follower {self.member_name} connected')
 
     def close_connection(self) -> None:
         self.socket.close()
         self.is_connected = False
-        logger.debug(f'follower {self.member_name} disconnected')
+        logger.debug(f'подписчик: "{self.member_name}" был отключен')
 
     def is_connected(self) -> bool:
         return self.has_connected
@@ -79,5 +78,5 @@ class BaseFollower(BaseMember, IFollower):
 
             message = self._deserialize_message_from_server(message_from_server=message)
             if message:
-                logger.debug('message from server received')
+                logger.debug('сообщение от сервера было получено')
                 yield message

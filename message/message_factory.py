@@ -16,21 +16,21 @@ class MessageFromFollowerFactory:
         return MessageFromFollower(
             message_text=message_text,
             request_type=PossibleRequestTypesFromFollower.NEW_MESSAGE,
-            sender_unique_name=self._unique_sender_name,
+            sender_member_name=self._unique_sender_name,
         )
 
     def create_ping_to_connect_message(self) -> MessageFromFollower:
         return MessageFromFollower(
             message_text='',
             request_type=PossibleRequestTypesFromFollower.PING_TO_CONNECT,
-            sender_unique_name=self._unique_sender_name,
+            sender_member_name=self._unique_sender_name,
         )
 
     def create_ping_to_disconnect_message(self) -> MessageFromFollower:
         return MessageFromFollower(
             message_text='',
             request_type=PossibleRequestTypesFromFollower.PING_TO_DISCONNECT,
-            sender_unique_name=self._unique_sender_name,
+            sender_member_name=self._unique_sender_name,
         )
 
 
@@ -42,7 +42,7 @@ class MessageFromPublisherFactory:
         return MessageFromPublisher(
             message_text=message_text,
             request_type=PossibleRequestTypesFromPublisher.NEW_MESSAGE,
-            sender_unique_name=self._unique_sender_name,
+            sender_member_name=self._unique_sender_name,
         )
 
 

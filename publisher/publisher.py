@@ -18,7 +18,7 @@ class SocketBasedPublisher(IPublisher, BaseMember):
         super().__init__(connection_config=connection_config, member_name=member_name)
         self._socket = BuildInBasedSocket()
         self.socket.connect(host=self.connection_config.host, port=self.connection_config.port)
-        logger.debug(f'publisher {self.member_name} connected')
+        logger.debug(f'издатель: "{self.member_name}" был подключен к брокеру')
         self._message_factory = MessageFromPublisherFactory(unique_sender_name=self.member_name)
 
     @property
@@ -28,8 +28,8 @@ class SocketBasedPublisher(IPublisher, BaseMember):
     def send_message(self, message_text: MessageData) -> None:
         message = self._message_factory.create_send_message(message_text=message_text)
         self.socket.send_message(message.as_bytes)
-        logger.debug(f'publisher {self.member_name} send message')
+        logger.debug(f'издатель: "{self.member_name}: отправил сообщение')
 
     def _close_connect(self):
         self.socket.close()
-        logger.debug(f'publisher {self.member_name} disconnected')
+        logger.debug(f'издатель: "{self.member_name}" был отключен')
