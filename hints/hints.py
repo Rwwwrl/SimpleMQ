@@ -1,5 +1,4 @@
 from typing import NewType, Any
 
-MessageData = NewType('Message', Any)
+MessageText = NewType('MessageText', Any)
 MemberName = NewType('MemberName', str)
-

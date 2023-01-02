@@ -23,7 +23,7 @@ class IMember(abc.ABC):
 class BaseMember(IMember):
     def __init__(self, connection_config: ConnectionConfig, member_name: Optional[MemberName] = None):
         if not member_name:
-            member_name = str(uuid.uuid4())
+            member_name = str(uuid.uuid4())[:8]
         self._member_name = member_name
         self._connection_config = connection_config
 

@@ -2,11 +2,11 @@ import abc
 from typing import Iterator, Optional
 
 from ..infrastructure.socket_adapter import socket
-from ..hints import MessageData
+from ..hints import MessageText
 from ..message.message_factory import MessageFromFollowerFactory
 from ..connection_config import ConnectionConfig
 from ..message_deserializer import message_deserializer
-from ..member import IMember, BaseMember
+from ..member import BaseMember
 from ..message.message import BaseMessage, MessageFromServer
 from ..logger_conf import logger
 from ..hints import MemberName
@@ -22,7 +22,7 @@ class IFollower(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _deserialize_message_from_server(self, message_from_server: bytes) -> MessageData:
+    def _deserialize_message_from_server(self, message_from_server: bytes) -> MessageText:
         pass
 
     @abc.abstractmethod
@@ -41,7 +41,7 @@ class IFollower(abc.ABC):
 class BaseFollower(BaseMember, IFollower):
     def __init__(self, connection_config: ConnectionConfig, member_name: Optional[MemberName] = None):
         super().__init__(member_name=member_name, connection_config=connection_config)
-        self._message_factory = MessageFromFollowerFactory(unique_sender_name=self.member_name)
+        self._message_factory = MessageFromFollowerFactory(sender_member_name=self.member_name)
         self.is_connected = False
 
     @property
@@ -54,9 +54,6 @@ class BaseFollower(BaseMember, IFollower):
 
         self._socket = socket.BuildInBasedSocket()
         self.socket.connect(host=self.connection_config.host, port=self.connection_config.port)
-        ping_to_connect_message = self._message_factory.create_ping_to_connect_message()
-        self.socket.send_message(ping_to_connect_message.as_bytes)
-
         self.is_connected = True
 
     def close_connection(self) -> None:
@@ -71,11 +68,15 @@ class BaseFollower(BaseMember, IFollower):
         return message_deserializer(message_from_server)
 
     def get_messages(self) -> Iterator[BaseMessage]:
+        message_to_get_new_message = self._message_factory.create_give_me_new_message()
         while True:
+            logger.debug(f'подписчик: {self.member_name} запросил новое сообщение')
+            self.socket.send_message(message_to_get_new_message.as_bytes)
             message = self.socket.recv()
             if not message:
                 continue
 
+            logger.debug(f'подписчик: {self.member_name} получил новое сообщение')
             message = self._deserialize_message_from_server(message_from_server=message)
             if message:
                 logger.debug('сообщение от сервера было получено')

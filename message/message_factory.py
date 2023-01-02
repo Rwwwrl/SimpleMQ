@@ -5,48 +5,41 @@ from .message import (
     PossibleRequestTypesFromFollower,
     PossibleRequestTypesFromPublisher,
 )
-from ..hints import MemberName, MessageData
+from ..hints import MemberName, MessageText
 
 
 class MessageFromFollowerFactory:
-    def __init__(self, unique_sender_name: MemberName):
-        self._unique_sender_name = unique_sender_name
+    def __init__(self, sender_member_name: MemberName):
+        self.sender_member_name = sender_member_name
 
-    def create_send_message(self, message_text: MessageData) -> MessageFromFollower:
+    def create_send_message(self, message_text: MessageText) -> MessageFromFollower:
         return MessageFromFollower(
             message_text=message_text,
             request_type=PossibleRequestTypesFromFollower.NEW_MESSAGE,
-            sender_member_name=self._unique_sender_name,
+            sender_member_name=self.sender_member_name,
         )
 
-    def create_ping_to_connect_message(self) -> MessageFromFollower:
+    def create_give_me_new_message(self) -> MessageFromFollower:
         return MessageFromFollower(
             message_text='',
-            request_type=PossibleRequestTypesFromFollower.PING_TO_CONNECT,
-            sender_member_name=self._unique_sender_name,
-        )
-
-    def create_ping_to_disconnect_message(self) -> MessageFromFollower:
-        return MessageFromFollower(
-            message_text='',
-            request_type=PossibleRequestTypesFromFollower.PING_TO_DISCONNECT,
-            sender_member_name=self._unique_sender_name,
+            request_type=PossibleRequestTypesFromFollower.GIVE_ME_NEW_MESSAGE,
+            sender_member_name=self.sender_member_name,
         )
 
 
 class MessageFromPublisherFactory:
-    def __init__(self, unique_sender_name: MemberName):
-        self._unique_sender_name = unique_sender_name
+    def __init__(self, sender_member_name: MemberName):
+        self.sender_member_name = sender_member_name
 
-    def create_send_message(self, message_text: MessageData) -> MessageFromPublisher:
+    def create_send_message(self, message_text: MessageText) -> MessageFromPublisher:
         return MessageFromPublisher(
             message_text=message_text,
             request_type=PossibleRequestTypesFromPublisher.NEW_MESSAGE,
-            sender_member_name=self._unique_sender_name,
+            sender_member_name=self.sender_member_name,
         )
 
 
 class MessageFromServerFactory:
     @staticmethod
-    def create_send_message(message_text: MessageData) -> MessageFromServer:
+    def create_send_message(message_text: MessageText) -> MessageFromServer:
         return MessageFromServer(message_text=message_text)

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Union
 
-from ..hints import MessageData, MemberName
+from ..hints import MessageText, MemberName
 from ..mixins.forwarded_object import ForwardedObject
 from ..utils.static_funcs.dataclass_to_bytes import dataclass_to_bytes
 
@@ -22,20 +22,19 @@ class PossibleRequestTypesFromPublisher(Enum):
 class PossibleRequestTypesFromFollower(Enum):
 
     NEW_MESSAGE = 'new message'
-    PING_TO_CONNECT = 'ping to connect'
-    PING_TO_DISCONNECT = 'ping to disconnet'
+    GIVE_ME_NEW_MESSAGE = 'give_me_new_message'
 
 
 PossibleRequestTypes = Union[PossibleRequestTypesFromFollower, PossibleRequestTypesFromPublisher]
 
 
-@dataclass
+@dataclass(kw_only=True)
 class BaseMessage:
 
-    sender_type: PossibleSenderTypes
+    sender_type: PossibleSenderTypes = None
     sender_member_name: MemberName
     request_type: PossibleRequestTypes
-    message_text: MessageData
+    message_text: MessageText
 
     @property
     def as_bytes(self) -> bytes:
@@ -44,8 +43,8 @@ class BaseMessage:
 
 @dataclass(kw_only=True)
 class MessageFromFollower(BaseMessage, ForwardedObject):
-
-    sender_type: PossibleSenderTypes = PossibleSenderTypes.FOLLOWER
+    def __post_init__(self):
+        self.sender_type: PossibleSenderTypes = PossibleSenderTypes.FOLLOWER
 
     @property
     def as_bytes(self) -> bytes:
@@ -55,8 +54,11 @@ class MessageFromFollower(BaseMessage, ForwardedObject):
 @dataclass(kw_only=True)
 class MessageFromServer(ForwardedObject):  # TODO надо логически обьяснить почему это не унаследовано от BaseMessage
 
-    sender_type: PossibleSenderTypes = PossibleSenderTypes.SERVER
-    message_text: MessageData
+    message_text: MessageText
+    sender_type: PossibleRequestTypes = None
+
+    def __post_init__(self):
+        self.sender_type: PossibleSenderTypes = PossibleSenderTypes.SERVER
 
     @property
     def as_bytes(self) -> bytes:
@@ -65,5 +67,5 @@ class MessageFromServer(ForwardedObject):  # TODO надо логически о
 
 @dataclass(kw_only=True)
 class MessageFromPublisher(BaseMessage, ForwardedObject):
-
-    sender_type: PossibleSenderTypes = PossibleSenderTypes.PUBLISHER
+    def __post_init__(self):
+        self.sender_type: PossibleSenderTypes = PossibleSenderTypes.PUBLISHER
