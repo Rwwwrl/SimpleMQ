@@ -1,6 +1,8 @@
 import abc
 from typing import Iterator, Optional
 
+from ..connection.connection import Connection
+from ..bind.bind import Bind
 from ..infrastructure.socket_adapter import socket
 from ..hints import MessageText
 from ..message.message_factory import MessageFromFollowerFactory
@@ -39,9 +41,14 @@ class IFollower(abc.ABC):
 
 
 class BaseFollower(BaseMember, IFollower):
-    def __init__(self, connection_config: ConnectionConfig, member_name: Optional[MemberName] = None):
-        super().__init__(member_name=member_name, connection_config=connection_config)
-        self._message_factory = MessageFromFollowerFactory(sender_member_name=self.member_name)
+    def __init__(
+        self,
+        connection: Connection,
+        bind: Bind,
+        member_name: Optional[MemberName] = None,
+    ):
+        super().__init__(member_name=member_name, connection=connection)
+        self._message_factory = MessageFromFollowerFactory(sender_member_name=self.member_name, bind=bind)
         self.is_connected = False
 
     @property
@@ -53,7 +60,7 @@ class BaseFollower(BaseMember, IFollower):
             return
 
         self._socket = socket.BuildInBasedSocket()
-        self.socket.connect(host=self.connection_config.host, port=self.connection_config.port)
+        self.socket.connect(host=self.connection.host, port=self.connection.port)
         self.is_connected = True
 
     def close_connection(self) -> None:

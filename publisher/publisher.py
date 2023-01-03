@@ -1,7 +1,8 @@
 from ..infrastructure.socket_adapter.socket import BuildInBasedSocket
 from typing import Optional
 
-from ..connection_config import ConnectionConfig
+from ..bind.bind import Bind
+from ..connection.connection import Connection
 from ..hints import MessageText, MemberName
 from ..member import BaseMember
 from ..logger_conf import logger
@@ -14,12 +15,12 @@ class IPublisher:
 
 
 class SocketBasedPublisher(IPublisher, BaseMember):
-    def __init__(self, connection_config: ConnectionConfig, member_name: Optional[MemberName] = None):
-        super().__init__(connection_config=connection_config, member_name=member_name)
+    def __init__(self, connection: Connection, bind: Bind, member_name: Optional[MemberName] = None):
+        super().__init__(connection=connection, member_name=member_name)
         self._socket = BuildInBasedSocket()
-        self.socket.connect(host=self.connection_config.host, port=self.connection_config.port)
+        self.socket.connect(host=self.connection.host, port=self.connection.port)
         logger.debug(f'издатель: "{self.member_name}" был подключен к брокеру')
-        self._message_factory = MessageFromPublisherFactory(sender_member_name=self.member_name)
+        self._message_factory = MessageFromPublisherFactory(sender_member_name=self.member_name, bind=bind)
 
     @property
     def socket(self):

@@ -1,19 +1,20 @@
 from __future__ import annotations
 
-from typing import Deque
 import asyncio
 from asyncio.base_events import Server as lib_Server
 from asyncio.streams import StreamReader, StreamWriter
-from collections import deque
+from typing import cast
 
 from . import exceptions
+from .. import hints
 from .follower import Follower
 from ..message_deserializer import message_deserializer
-from ..message.message import PossibleSenderTypes, MessageFromServer, PossibleRequestTypesFromFollower
+from ..message import message as message_module
 from ..request_message_convert_to_server_message import request_message_convert_to_server_message
 from ..logger_conf import logger
+from collections import deque
 
-STREAM: Deque[MessageFromServer] = deque([])
+STREAMS = hints.Streams({})
 
 
 class Server:
@@ -58,29 +59,45 @@ class Server:
 
                 logger.debug(f'было получено новое сообщение от {type(message).__name__}')
 
-                if message.sender_type == PossibleSenderTypes.PUBLISHER:
+                if message.sender_type == message_module.PossibleSenderTypes.PUBLISHER:
+                    message = cast(message_module.MessageFromPublisher, message)
                     message_from_server = request_message_convert_to_server_message(message=message)
-                    STREAM.append(message_from_server)
+                    stream_name = message.route_string
+                    STREAMS[stream_name].append(message_from_server)
 
-                if (
-                    message.sender_type == PossibleSenderTypes.FOLLOWER and
-                    message.request_type == PossibleRequestTypesFromFollower.GIVE_ME_NEW_MESSAGE.value
-                ):
-                    follower = Follower(member_name=message.sender_member_name, stream_writer=writer)
-                    while True:
-                        try:
-                            new_message = STREAM.popleft()
-                        except IndexError:
-                            await asyncio.sleep(0)
-                        else:
-                            await self._send_message_to_follower(follower=follower, message_from_server=new_message)
-                            break
+                if message.sender_type == message_module.PossibleSenderTypes.CURSOR:
+                    message = cast(message_module.MessageFromCursor, message)
+                    stream_name = message.message_text
+                    try:
+                        STREAMS[stream_name]
+                    except KeyError:
+                        STREAMS[stream_name] = deque([])
+                        logger.debug(f'был создан новый стрим с наименованием: {stream_name}')
+
+                if message.sender_type == message_module.PossibleSenderTypes.FOLLOWER:
+                    message = cast(message_module.MessageFromFollower, message)
+                    stream_name = message.route_string
+                    stream = STREAMS[stream_name]
+                    if message.request_type == message_module.PossibleRequestTypesFromFollower.GIVE_ME_NEW_MESSAGE.value:
+                        follower = Follower(member_name=message.sender_member_name, stream_writer=writer)
+                        while True:
+                            try:
+                                new_message = stream.popleft()
+                            except IndexError:
+                                await asyncio.sleep(0)
+                            else:
+                                await self._send_message_to_follower(follower=follower, message_from_server=new_message)
+                                break
             except exceptions.ConnectionToFollowerHasLost:
                 break
 
         writer.close()
 
-    async def _send_message_to_follower(self, follower: Follower, message_from_server: MessageFromServer) -> None:
+    async def _send_message_to_follower(
+        self,
+        follower: Follower,
+        message_from_server: message_module.MessageFromServer,
+    ) -> None:
         try:
             follower.stream_writer.write(message_from_server.as_bytes)
             await follower.stream_writer.drain()
