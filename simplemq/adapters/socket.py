@@ -21,6 +21,10 @@ class ISocket(abc.ABC):
     def close(self) -> None:
         pass
 
+    @abc.abstractproperty
+    def closed(self) -> bool:
+        pass
+
 
 class BuildInBasedSocket(ISocket):
     '''
@@ -43,3 +47,7 @@ class BuildInBasedSocket(ISocket):
 
     def close(self) -> None:
         self._sock.close()
+
+    @property
+    def closed(self) -> bool:
+        return self._sock._closed

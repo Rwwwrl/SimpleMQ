@@ -17,12 +17,12 @@ class PossibleSenderTypes(Enum):
 
 class PossibleRequestTypesFromPublisher(Enum):
 
-    NEW_MESSAGE = 'new message'
+    NEW_MESSAGE = 'new_message'
 
 
 class PossibleRequestTypesFromFollower(Enum):
 
-    NEW_MESSAGE = 'new message'
+    NEW_MESSAGE = 'new_message'
     GIVE_ME_NEW_MESSAGE = 'give_me_new_message'
 
 

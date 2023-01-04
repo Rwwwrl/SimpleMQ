@@ -1,4 +1,5 @@
 import abc
+import signal
 from typing import Iterator, Optional
 
 from .. import hints
@@ -8,7 +9,7 @@ from ..connection import Connection
 from ..logger_conf import LOGGER
 from ..member import BaseMember
 from ..message.deserializer import message_deserializer
-from ..message.message import BaseMessage, MessageFromServer
+from ..message.message import MessageFromServer
 from ..message.message_factory import MessageFromFollowerFactory
 
 
@@ -34,7 +35,7 @@ class IFollower(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_messages(self) -> Iterator[BaseMessage]:
+    def get_messages(self) -> Iterator[MessageFromServer]:
         pass
 
 
@@ -47,7 +48,8 @@ class BaseFollower(BaseMember, IFollower):
     ):
         super().__init__(member_name=member_name, connection=connection)
         self._message_factory = MessageFromFollowerFactory(sender_member_name=self.member_name, bind=bind)
-        self.is_connected = False
+        signal.signal(signal.SIGINT, self.close_connection_on_sigterm)
+        signal.signal(signal.SIGTERM, self.close_connection_on_sigterm)
 
     @property
     def socket(self) -> socket.BuildInBasedSocket:
@@ -59,25 +61,32 @@ class BaseFollower(BaseMember, IFollower):
 
         self._socket = socket.BuildInBasedSocket()
         self.socket.connect(host=self.connection.host, port=self.connection.port)
-        self.is_connected = True
+
+    def close_connection_on_sigterm(self, *args) -> None:
+        self.close_connection()
 
     def close_connection(self) -> None:
+        if not self.is_connected:
+            return
         self.socket.close()
-        self.is_connected = False
         LOGGER.debug(f'подписчик: "{self.member_name}" был отключен')
 
+    @property
     def is_connected(self) -> bool:
-        return self.has_connected
+        return not self.socket.closed
 
     def _deserialize_message_from_server(self, message_from_server: bytes) -> MessageFromServer:
         return message_deserializer(message_from_server)
 
-    def get_messages(self) -> Iterator[BaseMessage]:
+    def get_messages(self) -> Iterator[MessageFromServer]:
         message_to_get_new_message = self._message_factory.create_give_me_new_message()
-        while True:
+        while self.is_connected:
             LOGGER.debug(f'подписчик: {self.member_name} запросил новое сообщение')
             self.socket.send_message(message_to_get_new_message.as_bytes)
-            message = self.socket.recv()
+            try:
+                message = self.socket.recv()
+            except OSError:
+                continue
             if not message:
                 continue
 
@@ -86,3 +95,4 @@ class BaseFollower(BaseMember, IFollower):
             if message:
                 LOGGER.debug('сообщение от сервера было получено')
                 yield message
+        self.close_connection()
