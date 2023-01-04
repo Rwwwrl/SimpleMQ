@@ -3,9 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from . import hints
-from .bind import Bind
-from .message import message_factory, message
 from .adapters import socket
+from .bind import Bind
+from .message import message, message_factory
 
 
 @dataclass

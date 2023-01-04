@@ -1,16 +1,15 @@
 import abc
 from typing import Iterator, Optional
 
-from ..connection import Connection
-from ..bind import Bind
+from .. import hints
 from ..adapters import socket
-from ..hints import MessageText
-from ..message.message_factory import MessageFromFollowerFactory
-from ..message.deserializer import message_deserializer
-from ..member import BaseMember
-from ..message.message import BaseMessage, MessageFromServer
+from ..bind import Bind
+from ..connection import Connection
 from ..logger_conf import LOGGER
-from ..hints import MemberName
+from ..member import BaseMember
+from ..message.deserializer import message_deserializer
+from ..message.message import BaseMessage, MessageFromServer
+from ..message.message_factory import MessageFromFollowerFactory
 
 
 class IFollower(abc.ABC):
@@ -23,7 +22,7 @@ class IFollower(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _deserialize_message_from_server(self, message_from_server: bytes) -> MessageText:
+    def _deserialize_message_from_server(self, message_from_server: bytes) -> hints.MessageText:
         pass
 
     @abc.abstractmethod
@@ -44,7 +43,7 @@ class BaseFollower(BaseMember, IFollower):
         self,
         connection: Connection,
         bind: Bind,
-        member_name: Optional[MemberName] = None,
+        member_name: Optional[hints.MemberName] = None,
     ):
         super().__init__(member_name=member_name, connection=connection)
         self._message_factory = MessageFromFollowerFactory(sender_member_name=self.member_name, bind=bind)

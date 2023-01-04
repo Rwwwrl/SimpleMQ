@@ -1,10 +1,10 @@
+import json
 from typing import Union
 
 from . import message as message_module
-import json
 
 PossibleMessages = Union[message_module.MessageFromCursor, message_module.MessageFromFollower,
-                         message_module.MessageFromPublisher, message_module.MessageFromServer, ]
+                         message_module.MessageFromPublisher, message_module.MessageFromServer]
 
 
 def message_deserializer(message: bytes) -> PossibleMessages:
@@ -27,7 +27,7 @@ def message_deserializer(message: bytes) -> PossibleMessages:
         )
 
     if message_as_json['sender_type'] == message_module.PossibleSenderTypes.SERVER.value:
-        return message_module.MessageFromServer(message_text=message_as_json['message_text'], )
+        return message_module.MessageFromServer(message_text=message_as_json['message_text'])
 
     if message_as_json['sender_type'] == message_module.PossibleSenderTypes.CURSOR.value:
         return message_module.MessageFromCursor(

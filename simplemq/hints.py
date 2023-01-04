@@ -1,4 +1,4 @@
-from typing import NewType, Any, Dict, Deque
+from typing import Any, Deque, Dict, NewType
 
 MessageText = NewType('MessageText', Any)
 MemberName = NewType('MemberName', str)
@@ -6,7 +6,7 @@ MemberName = NewType('MemberName', str)
 RouteString = NewType('RouteString', str)
 
 StreamName = NewType('StreamName', str)
-Stream = NewType('Stream', Deque)  # TODO пока что он состоит из MessageFromServer
+Stream = NewType('Stream', Deque)    # TODO пока что он состоит из MessageFromServer
 Streams = NewType('Streams', Dict[StreamName, Stream])
 
 Host = NewType('Host', str)

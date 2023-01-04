@@ -1,12 +1,12 @@
-from logging import config
 import logging
+from logging import config
 
 LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'default_formatter': {
-            'format': '%(asctime)s:[%(levelname)s] %(message)s'
+            'format': '%(asctime)s:[%(levelname)s] %(message)s',
         },
     },
     'handlers': {
@@ -19,9 +19,9 @@ LOGGING_CONFIG = {
         'root': {
             'handlers': ['stream_handler'],
             'level': 'DEBUG',
-            'propagate': True
-        }
-    }
+            'propagate': True,
+        },
+    },
 }
 
 config.dictConfig(LOGGING_CONFIG)

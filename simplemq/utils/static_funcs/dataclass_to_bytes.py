@@ -1,5 +1,5 @@
-from dataclasses import asdict
 import json
+from dataclasses import asdict
 from enum import Enum
 from uuid import UUID
 

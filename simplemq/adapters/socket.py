@@ -1,5 +1,5 @@
-import socket
 import abc
+import socket
 
 from .. import hints
 
@@ -24,7 +24,7 @@ class ISocket(abc.ABC):
 
 class BuildInBasedSocket(ISocket):
     '''
-    класс адаптер, базированный на встроенной библиотеке socket 
+    класс адаптер, базированный на встроенной библиотеке socket
     '''
 
     _sock: socket.socket

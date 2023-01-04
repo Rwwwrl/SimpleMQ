@@ -3,16 +3,16 @@ from __future__ import annotations
 import asyncio
 from asyncio.base_events import Server as lib_Server
 from asyncio.streams import StreamReader, StreamWriter
+from collections import deque
 from typing import cast
 
 from . import exceptions
-from .. import hints
 from .stream_writer_wrapper import StreamWriterWrapper
-from ..message.deserializer import message_deserializer
+from .. import hints
+from ..logger_conf import LOGGER
 from ..message import message as message_module
 from ..message.convert_request_message_to_server_message import convert_request_message_to_server_message
-from ..logger_conf import LOGGER
-from collections import deque
+from ..message.deserializer import message_deserializer
 
 STREAMS = hints.Streams({})
 
@@ -78,7 +78,7 @@ class Server:
                     message = cast(message_module.MessageFromFollower, message)
                     stream_name = message.route_string
                     stream = STREAMS[stream_name]
-                    if message.request_type == message_module.PossibleRequestTypesFromFollower.GIVE_ME_NEW_MESSAGE.value:
+                    if message.request_type == message_module.PossibleRequestTypesFromFollower.GIVE_ME_NEW_MESSAGE.value:    # noqa
                         follower = StreamWriterWrapper(member_name=message.sender_member_name, stream_writer=writer)
                         while True:
                             try:
@@ -102,7 +102,7 @@ class Server:
             follower.stream_writer.write(message_from_server.as_bytes)
             await follower.stream_writer.drain()
             LOGGER.debug(f'сообщение к подписчику: "{follower.member_name}" было успешно доставлено')
-        except ConnectionResetError as e:
+        except ConnectionResetError:
             LOGGER.warning(f'сразу доставить сообщения подписчику {follower.member_name} не удалось')
             raise exceptions.ConnectionToFollowerHasLost
 
