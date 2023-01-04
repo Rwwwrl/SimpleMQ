@@ -1,16 +1,15 @@
 import abc
 from typing import Iterator, Optional
 
-from ..connection.connection import Connection
-from ..bind.bind import Bind
-from ..infrastructure.socket_adapter import socket
+from ..connection import Connection
+from ..bind import Bind
+from ..adapters import socket
 from ..hints import MessageText
 from ..message.message_factory import MessageFromFollowerFactory
-from ..connection_config import ConnectionConfig
-from ..message_deserializer import message_deserializer
+from ..message.deserializer import message_deserializer
 from ..member import BaseMember
 from ..message.message import BaseMessage, MessageFromServer
-from ..logger_conf import logger
+from ..logger_conf import LOGGER
 from ..hints import MemberName
 
 
@@ -66,7 +65,7 @@ class BaseFollower(BaseMember, IFollower):
     def close_connection(self) -> None:
         self.socket.close()
         self.is_connected = False
-        logger.debug(f'подписчик: "{self.member_name}" был отключен')
+        LOGGER.debug(f'подписчик: "{self.member_name}" был отключен')
 
     def is_connected(self) -> bool:
         return self.has_connected
@@ -77,14 +76,14 @@ class BaseFollower(BaseMember, IFollower):
     def get_messages(self) -> Iterator[BaseMessage]:
         message_to_get_new_message = self._message_factory.create_give_me_new_message()
         while True:
-            logger.debug(f'подписчик: {self.member_name} запросил новое сообщение')
+            LOGGER.debug(f'подписчик: {self.member_name} запросил новое сообщение')
             self.socket.send_message(message_to_get_new_message.as_bytes)
             message = self.socket.recv()
             if not message:
                 continue
 
-            logger.debug(f'подписчик: {self.member_name} получил новое сообщение')
+            LOGGER.debug(f'подписчик: {self.member_name} получил новое сообщение')
             message = self._deserialize_message_from_server(message_from_server=message)
             if message:
-                logger.debug('сообщение от сервера было получено')
+                LOGGER.debug('сообщение от сервера было получено')
                 yield message

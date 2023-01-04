@@ -2,7 +2,7 @@ import abc
 import uuid
 from typing import Optional
 
-from .connection.connection import Connection
+from .connection import Connection
 from .hints import MemberName
 
 

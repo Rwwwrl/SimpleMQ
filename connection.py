@@ -1,14 +1,36 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from . import hints
+from dataclasses import dataclass
+from .bind import Bind
+from .message import message_factory, message
+from .adapters import socket
 
-from ..bind.bind import Bind
-from ..message import message_factory
-from ..message import message
-from ..infrastructure.socket_adapter import socket
 
-if TYPE_CHECKING:
-    from .connection import Connection
+@dataclass
+class ConnectionConfig:
+
+    host: hints.Host
+    port: hints.Port
+
+
+class Connection:
+
+    connection_config: ConnectionConfig
+
+    def __init__(self, connection_config: ConnectionConfig):
+        self.connection_config = connection_config
+
+    @property
+    def host(self) -> hints.Host:
+        return self.connection_config.host
+
+    @property
+    def port(self) -> hints.Port:
+        return self.connection_config.port
+
+    def cursor(self) -> Cursor:
+        return Cursor(connection=self)
 
 
 class Cursor:

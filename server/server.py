@@ -7,11 +7,11 @@ from typing import cast
 
 from . import exceptions
 from .. import hints
-from .follower import Follower
-from ..message_deserializer import message_deserializer
+from .stream_writer_wrapper import StreamWriterWrapper
+from ..message.deserializer import message_deserializer
 from ..message import message as message_module
-from ..request_message_convert_to_server_message import request_message_convert_to_server_message
-from ..logger_conf import logger
+from ..message.convert_request_message_to_server_message import convert_request_message_to_server_message
+from ..logger_conf import LOGGER
 from collections import deque
 
 STREAMS = hints.Streams({})
@@ -34,7 +34,7 @@ class Server:
 
     async def run_server(self):
         async with self.server:
-            logger.debug(f'сервер был запущен на {self.HOST}:{self.PORT}')
+            LOGGER.debug(f'сервер был запущен на {self.HOST}:{self.PORT}')
             await self.server.serve_forever()
 
     async def _callback_function(self, reader: StreamReader, writer: StreamWriter):
@@ -52,16 +52,16 @@ class Server:
                 try:
                     message = message_deserializer(message=request_message)
                 except Exception:
-                    logger.exception(
+                    LOGGER.exception(
                         f'request_message должен быть унаследован от ForwardedObject, получено: "{request_message}"',
                     )
                     continue
 
-                logger.debug(f'было получено новое сообщение от {type(message).__name__}')
+                LOGGER.debug(f'было получено новое сообщение от {type(message).__name__}')
 
                 if message.sender_type == message_module.PossibleSenderTypes.PUBLISHER:
                     message = cast(message_module.MessageFromPublisher, message)
-                    message_from_server = request_message_convert_to_server_message(message=message)
+                    message_from_server = convert_request_message_to_server_message(message=message)
                     stream_name = message.route_string
                     STREAMS[stream_name].append(message_from_server)
 
@@ -72,14 +72,14 @@ class Server:
                         STREAMS[stream_name]
                     except KeyError:
                         STREAMS[stream_name] = deque([])
-                        logger.debug(f'был создан новый стрим с наименованием: {stream_name}')
+                        LOGGER.debug(f'был создан новый стрим с наименованием: {stream_name}')
 
                 if message.sender_type == message_module.PossibleSenderTypes.FOLLOWER:
                     message = cast(message_module.MessageFromFollower, message)
                     stream_name = message.route_string
                     stream = STREAMS[stream_name]
                     if message.request_type == message_module.PossibleRequestTypesFromFollower.GIVE_ME_NEW_MESSAGE.value:
-                        follower = Follower(member_name=message.sender_member_name, stream_writer=writer)
+                        follower = StreamWriterWrapper(member_name=message.sender_member_name, stream_writer=writer)
                         while True:
                             try:
                                 new_message = stream.popleft()
@@ -95,19 +95,19 @@ class Server:
 
     async def _send_message_to_follower(
         self,
-        follower: Follower,
+        follower: StreamWriterWrapper,
         message_from_server: message_module.MessageFromServer,
     ) -> None:
         try:
             follower.stream_writer.write(message_from_server.as_bytes)
             await follower.stream_writer.drain()
-            logger.debug(f'сообщение к подписчику: "{follower.member_name}" было успешно доставлено')
+            LOGGER.debug(f'сообщение к подписчику: "{follower.member_name}" было успешно доставлено')
         except ConnectionResetError as e:
-            logger.warning(f'сразу доставить сообщения подписчику {follower.member_name} не удалось')
-            raise exceptions.ConnectionToFollowerHasLost(follower=follower)
+            LOGGER.warning(f'сразу доставить сообщения подписчику {follower.member_name} не удалось')
+            raise exceptions.ConnectionToFollowerHasLost
 
         except Exception as e:
-            logger.exception('Какая-то ошибка!')
+            LOGGER.exception('Какая-то ошибка!')
             raise e
 
 

@@ -1,6 +1,6 @@
 from typing import Union
 
-from .message import message as message_module
+from . import message as message_module
 import json
 
 PossibleMessages = Union[message_module.MessageFromCursor, message_module.MessageFromFollower,

@@ -5,7 +5,7 @@ from asyncio.streams import StreamWriter
 
 
 @dataclass
-class Follower:
+class StreamWriterWrapper:
 
     member_name: MemberName
     stream_writer: StreamWriter

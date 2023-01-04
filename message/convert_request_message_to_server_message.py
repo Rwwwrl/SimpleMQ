@@ -1,10 +1,10 @@
 from typing import Union
 
-from .message.message import MessageFromFollower, MessageFromPublisher, MessageFromServer
-from .message.message_factory import MessageFromServerFactory
+from .message import MessageFromFollower, MessageFromPublisher, MessageFromServer
+from .message_factory import MessageFromServerFactory
 
 
-def request_message_convert_to_server_message(
+def convert_request_message_to_server_message(
     message: Union[MessageFromFollower, MessageFromPublisher],
 ) -> MessageFromServer:
     factory = MessageFromServerFactory

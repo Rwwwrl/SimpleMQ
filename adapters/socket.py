@@ -1,9 +1,7 @@
 import socket
 import abc
-from typing import NewType
 
-Host = NewType('Host', str)
-Port = NewType('Port', int)
+from .. import hints
 
 
 class ISocket(abc.ABC):
@@ -16,7 +14,7 @@ class ISocket(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def connect(self, host: Host, port: Port) -> None:
+    def connect(self, host: hints.Host, port: hints.Port) -> None:
         pass
 
     @abc.abstractmethod
@@ -40,7 +38,7 @@ class BuildInBasedSocket(ISocket):
     def recv(self) -> bytes:
         return self._sock.recv(1024)
 
-    def connect(self, host: Host, port: Port) -> None:
+    def connect(self, host: hints.Host, port: hints.Port) -> None:
         self._sock.connect((host, port))
 
     def close(self) -> None:

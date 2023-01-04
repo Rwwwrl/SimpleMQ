@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Union
 
 from .. import hints
-from ..mixins.forwarded_object import ForwardedObject
+from ..mixins import ForwardedObject
 from ..utils.static_funcs.dataclass_to_bytes import dataclass_to_bytes
 
 
@@ -31,7 +31,8 @@ class PossibleRequestTypesFromCursor(Enum):
     CREATE_STREAM = 'create_stream'
 
 
-PossibleRequestTypes = Union[PossibleRequestTypesFromFollower, PossibleRequestTypesFromPublisher]
+PossibleRequestTypes = Union[PossibleRequestTypesFromFollower,
+                             PossibleRequestTypesFromPublisher]  # TODO почему тут только от двух возможно?
 
 
 @dataclass(kw_only=True)

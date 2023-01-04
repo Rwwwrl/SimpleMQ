@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ..hints import RouteString
+from .hints import RouteString
 
 
 @dataclass

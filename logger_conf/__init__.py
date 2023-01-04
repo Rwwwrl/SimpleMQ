@@ -1,4 +1,1 @@
-from .logger_configuration import *
-import logging
-
-logger = logging.getLogger('root')
+from .logger_setup import LOGGER
