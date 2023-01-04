@@ -41,7 +41,7 @@ class Server:
         while True:
 
             try:
-                try:  # TODO обернуть в ~ def handle_message
+                try:    # TODO обернуть в ~ def handle_message
                     request_message = (await reader.read(255))
                 except ConnectionResetError:
                     break

@@ -32,7 +32,7 @@ class PossibleRequestTypesFromCursor(Enum):
 
 
 PossibleRequestTypes = Union[PossibleRequestTypesFromFollower,
-                             PossibleRequestTypesFromPublisher]  # TODO почему тут только от двух возможно?
+                             PossibleRequestTypesFromPublisher]    # TODO почему тут только от двух возможно?
 
 
 @dataclass(kw_only=True)
@@ -66,7 +66,7 @@ class MessageFromPublisher(BaseMessage, ForwardedObject):
 
 
 @dataclass(kw_only=True)
-class MessageFromServer(ForwardedObject):  # TODO надо логически обьяснить почему это не унаследовано от BaseMessage
+class MessageFromServer(ForwardedObject):    # TODO надо логически обьяснить почему это не унаследовано от BaseMessage
 
     message_text: hints.MessageText
     sender_type: PossibleRequestTypes = None

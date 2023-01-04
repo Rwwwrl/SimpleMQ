@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from . import hints
 from dataclasses import dataclass
+
+from . import hints
 from .bind import Bind
 from .message import message_factory, message
 from .adapters import socket
@@ -40,7 +41,8 @@ class Cursor:
 
     def create_stream(self, bind: Bind) -> None:
         message_to_create_new_stream = self.message_factory.create_message_to_create_stream(
-            stream_name=bind.route_string,  # TODO пока не бьются наименования, в общем смысле route_key != stream_name
+            stream_name=bind.
+            route_string,    # TODO пока не бьются наименования, в общем смысле route_key != stream_name
         )
         self._send_message(message_from_cursor=message_to_create_new_stream)
 
