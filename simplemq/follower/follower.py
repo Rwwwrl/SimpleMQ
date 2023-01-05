@@ -23,10 +23,6 @@ class IFollower(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _deserialize_message_from_server(self, message_from_server: bytes) -> hints.MessageText:
-        pass
-
-    @abc.abstractmethod
     def open_connection(self) -> None:
         pass
 

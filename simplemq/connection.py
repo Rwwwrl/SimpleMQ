@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 from . import hints
 from .adapters import socket
-from .bind import Bind
 from .message import message, message_factory
 
 
@@ -39,16 +38,13 @@ class Cursor:
         self.connection = connection
         self.message_factory = message_factory.MessageFromCursorFactory
 
-    def create_stream(self, bind: Bind) -> None:
-        message_to_create_new_stream = self.message_factory.create_message_to_create_stream(
-            stream_name=bind.
-            route_string,    # TODO пока не бьются наименования, в общем смысле route_key != stream_name
-        )
+    def create_stream(self, stream_name: hints.StreamName) -> None:
+        message_to_create_new_stream = self.message_factory.create_message_to_create_stream(stream_name=stream_name)
         self._send_message(message_from_cursor=message_to_create_new_stream)
 
     def _send_message(self, message_from_cursor: message.MessageFromCursor) -> None:
         self.socket = socket.BuildInBasedSocket()
         self.socket.connect(self.connection.host, self.connection.port)
-        self.socket.send_message(message_from_cursor.as_bytes())
+        self.socket.send_message(message_from_cursor.as_bytes)
         self.socket.close()
         del self.socket

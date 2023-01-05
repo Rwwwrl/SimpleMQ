@@ -3,6 +3,8 @@ import socket
 
 from .. import hints
 
+BUFF_SIZE = 1024
+
 
 class ISocket(abc.ABC):
     @abc.abstractmethod
@@ -29,18 +31,19 @@ class ISocket(abc.ABC):
 class BuildInBasedSocket(ISocket):
     '''
     класс адаптер, базированный на встроенной библиотеке socket
+    при этом мы используем TCP протокол
     '''
 
     _sock: socket.socket
 
     def __init__(self):
-        self._sock = socket.socket()
+        self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def send_message(self, message: bytes) -> None:
         self._sock.send(message)
 
     def recv(self) -> bytes:
-        return self._sock.recv(1024)
+        return self._sock.recv(BUFF_SIZE)
 
     def connect(self, host: hints.Host, port: hints.Port) -> None:
         self._sock.connect((host, port))

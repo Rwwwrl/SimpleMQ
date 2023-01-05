@@ -10,7 +10,7 @@ from ..message.message_factory import MessageFromPublisherFactory
 
 
 class IPublisher:
-    def send_message(self, message_text: hints.MessageText) -> None:
+    def send_message(self, message_body: hints.MessageBody) -> None:
         raise NotImplementedError
 
 
@@ -19,8 +19,8 @@ class SocketBasedPublisher(IPublisher, BaseMember):
         super().__init__(connection=connection, member_name=member_name)
         self._message_factory = MessageFromPublisherFactory(sender_member_name=self.member_name, bind=bind)
 
-    def send_message(self, message_text: hints.MessageText) -> None:
-        message = self._message_factory.create_send_message(message_text=message_text)
+    def send_message(self, message_body: hints.MessageBody) -> None:
+        message = self._message_factory.create_send_message(message_body=message_body)
         self.socket = BuildInBasedSocket()
         self.socket.connect(host=self.connection.host, port=self.connection.port)
         self.socket.send_message(message.as_bytes)

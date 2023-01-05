@@ -14,7 +14,7 @@ def message_deserializer(message: bytes) -> PossibleMessages:
         return message_module.MessageFromFollower(
             sender_member_name=message_as_json['sender_member_name'],
             request_type=message_as_json['request_type'],
-            message_text=message_as_json['message_text'],
+            message_body=message_as_json['message_body'],
             route_string=message_as_json['route_string'],
         )
 
@@ -22,15 +22,18 @@ def message_deserializer(message: bytes) -> PossibleMessages:
         return message_module.MessageFromPublisher(
             sender_member_name=message_as_json['sender_member_name'],
             request_type=message_as_json['request_type'],
-            message_text=message_as_json['message_text'],
+            message_body=message_as_json['message_body'],
             route_string=message_as_json['route_string'],
         )
 
     if message_as_json['sender_type'] == message_module.PossibleSenderTypes.SERVER.value:
-        return message_module.MessageFromServer(message_text=message_as_json['message_text'])
+        return message_module.MessageFromServer(
+            message_body=message_as_json['message_body'],
+            request_type=message_as_json['request_type'],
+        )
 
     if message_as_json['sender_type'] == message_module.PossibleSenderTypes.CURSOR.value:
         return message_module.MessageFromCursor(
-            message_text=message_as_json['message_text'],
+            message_body=message_as_json['message_body'],
             request_type=message_as_json['request_type'],
         )

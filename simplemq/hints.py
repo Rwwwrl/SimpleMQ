@@ -1,6 +1,6 @@
 from typing import Any, Deque, Dict, NewType
 
-MessageText = NewType('MessageText', Any)
+MessageBody = NewType('MessageBody', Any)
 MemberName = NewType('MemberName', str)
 
 RouteString = NewType('RouteString', str)

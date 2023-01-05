@@ -67,7 +67,7 @@ class Server:
 
                 if message.sender_type == message_module.PossibleSenderTypes.CURSOR:
                     message = cast(message_module.MessageFromCursor, message)
-                    stream_name = message.message_text
+                    stream_name = message.message_body
                     try:
                         STREAMS[stream_name]
                     except KeyError:
@@ -90,6 +90,10 @@ class Server:
                                 break
             except exceptions.ConnectionToFollowerHasLost:
                 break
+
+            except Exception as e:
+                LOGGER.exception('При обработке запроса произошла ошибка!')
+                raise e
 
         writer.close()
 

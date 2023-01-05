@@ -8,9 +8,9 @@ class MessageFromFollowerFactory:
         self.sender_member_name = sender_member_name
         self.route_string = bind.route_string
 
-    def create_send_message(self, message_text: hints.MessageText) -> message.MessageFromFollower:
+    def create_send_message(self, message_body: hints.MessageBody) -> message.MessageFromFollower:
         return message.MessageFromFollower(
-            message_text=message_text,
+            message_body=message_body,
             request_type=message.PossibleRequestTypesFromFollower.NEW_MESSAGE,
             sender_member_name=self.sender_member_name,
             route_string=self.route_string,
@@ -18,7 +18,7 @@ class MessageFromFollowerFactory:
 
     def create_give_me_new_message(self) -> message.MessageFromFollower:
         return message.MessageFromFollower(
-            message_text='',
+            message_body=None,
             request_type=message.PossibleRequestTypesFromFollower.GIVE_ME_NEW_MESSAGE,
             sender_member_name=self.sender_member_name,
             route_string=self.route_string,
@@ -30,9 +30,9 @@ class MessageFromPublisherFactory:
         self.sender_member_name = sender_member_name
         self.route_string = bind.route_string
 
-    def create_send_message(self, message_text: hints.MessageText) -> message.MessageFromPublisher:
+    def create_send_message(self, message_body: hints.MessageBody) -> message.MessageFromPublisher:
         return message.MessageFromPublisher(
-            message_text=message_text,
+            message_body=message_body,
             request_type=message.PossibleRequestTypesFromPublisher.NEW_MESSAGE,
             sender_member_name=self.sender_member_name,
             route_string=self.route_string,
@@ -41,14 +41,17 @@ class MessageFromPublisherFactory:
 
 class MessageFromServerFactory:
     @staticmethod
-    def create_send_message(message_text: hints.MessageText) -> message.MessageFromServer:
-        return message.MessageFromServer(message_text=message_text)
+    def create_send_message(message_body: hints.MessageBody) -> message.MessageFromServer:
+        return message.MessageFromServer(
+            message_body=message_body,
+            request_type=message.PossibleRequestTypesFromServer.NEW_MESSAGE_TO_FOLLOWER,
+        )
 
 
 class MessageFromCursorFactory:
     @staticmethod
     def create_message_to_create_stream(stream_name: hints.StreamName) -> message.MessageFromCursor:
         return message.MessageFromCursor(
-            message_text=stream_name,
+            message_body=stream_name,
             request_type=message.PossibleRequestTypesFromCursor.CREATE_STREAM,
         )
