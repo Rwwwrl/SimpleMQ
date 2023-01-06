@@ -6,6 +6,8 @@ from asyncio.streams import StreamReader, StreamWriter
 from collections import deque
 from typing import cast
 
+from decouple import config
+
 from . import exceptions
 from .stream_writer_wrapper import StreamWriterWrapper
 from .. import hints
@@ -22,8 +24,8 @@ class Server:
     @classmethod
     async def acreate(cls) -> Server:
         self = cls()
-        self.HOST = 'localhost'
-        self.PORT = 9090
+        self.HOST = config('SERVER_HOST')
+        self.PORT = int(config('SERVER_PORT'))
 
         self.server: lib_Server = await asyncio.start_server(
             client_connected_cb=self._callback_function,
