@@ -8,9 +8,9 @@ from ..bind import Bind
 from ..connection import Connection
 from ..logger_conf import LOGGER
 from ..member import BaseMember
-from ..message.deserializer import message_deserializer
-from ..message.message import MessageFromServer
-from ..message.message_factory import MessageFromFollowerFactory
+from ..message_package.deserializer import message_deserializer
+from ..message_package.message import MessageFromServer
+from ..message_package.message_factory import MessageFromFollowerFactory
 
 
 class IFollower(abc.ABC):
@@ -92,3 +92,7 @@ class BaseFollower(BaseMember, IFollower):
                 LOGGER.debug('сообщение от сервера было получено')
                 yield message
         self.close_connection()
+
+    def ack_message(self, message_from_server: MessageFromServer) -> None:
+        message = self._message_factory.create_ack_message(message_id=message_from_server.id)
+        self.socket.send_message(message.as_bytes)

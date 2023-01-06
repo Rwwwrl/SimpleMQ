@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, Union
+from typing import Optional, TYPE_CHECKING, Union
 
-from .. import hints, mixins
+from .. import mixins
 from ..utils.static_funcs import dataclass_to_bytes
+
+if TYPE_CHECKING:
+    from .. import hints
 
 
 class PossibleSenderTypes(Enum):
@@ -23,6 +28,7 @@ class PossibleRequestTypesFromFollower(Enum):
 
     NEW_MESSAGE = 'new_message'
     GIVE_ME_NEW_MESSAGE = 'give_me_new_message'
+    ACK_MESSAGE = 'ack_message'
 
 
 class PossibleRequestTypesFromServer(Enum):
@@ -70,6 +76,9 @@ class MessageFromPublisher(IMessageFromMember):
 
 @dataclass(kw_only=True)
 class MessageFromServer(IMessage):
+
+    id: hints.MessageId
+
     def __post_init__(self):
         self.sender_type: PossibleSenderTypes = PossibleSenderTypes.SERVER
 

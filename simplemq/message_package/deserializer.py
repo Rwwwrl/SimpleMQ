@@ -28,6 +28,7 @@ def message_deserializer(message: bytes) -> PossibleMessages:
 
     if message_as_json['sender_type'] == message_module.PossibleSenderTypes.SERVER.value:
         return message_module.MessageFromServer(
+            id=int(message_as_json['id']),
             message_body=message_as_json['message_body'],
             request_type=message_as_json['request_type'],
         )

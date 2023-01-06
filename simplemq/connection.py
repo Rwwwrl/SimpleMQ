@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from . import hints
 from .adapters import socket
-from .message import message, message_factory
+from .message_package import message, message_factory
 
 
 @dataclass

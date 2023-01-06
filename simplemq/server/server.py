@@ -10,11 +10,12 @@ from . import exceptions
 from .stream_writer_wrapper import StreamWriterWrapper
 from .. import hints
 from ..logger_conf import LOGGER
-from ..message import message as message_module
-from ..message.convert_request_message_to_server_message import convert_request_message_to_server_message
-from ..message.deserializer import message_deserializer
+from ..message_package import message as message_module
+from ..message_package.convert_request_message_to_server_message import convert_request_message_to_server_message
+from ..message_package.deserializer import message_deserializer
 
 STREAMS = hints.Streams({})
+PEL = hints.PEL({})
 
 
 class Server:
@@ -76,9 +77,9 @@ class Server:
 
                 if message.sender_type == message_module.PossibleSenderTypes.FOLLOWER:
                     message = cast(message_module.MessageFromFollower, message)
-                    stream_name = message.route_string
-                    stream = STREAMS[stream_name]
                     if message.request_type == message_module.PossibleRequestTypesFromFollower.GIVE_ME_NEW_MESSAGE.value:    # noqa
+                        stream_name = message.route_string
+                        stream = STREAMS[stream_name]
                         follower = StreamWriterWrapper(member_name=message.sender_member_name, stream_writer=writer)
                         while True:
                             try:
@@ -86,8 +87,28 @@ class Server:
                             except IndexError:
                                 await asyncio.sleep(0)
                             else:
-                                await self._send_message_to_follower(follower=follower, message_from_server=new_message)
-                                break
+                                try:
+                                    await self._send_message_to_follower(
+                                        follower=follower,
+                                        message_from_server=new_message,
+                                    )
+                                    PEL.setdefault(message.sender_member_name, deque([]))
+                                    PEL[message.sender_member_name].append(new_message)
+                                except Exception as e:
+                                    # если нам не удалось доставить сообщение по какой-либо причине,
+                                    # то мы возвращаем его обратно в стрим
+                                    stream.appendleft(new_message)
+                                    LOGGER.error('Неизвестная ошибка')
+                                    raise e
+                                else:
+                                    break
+                    if message.request_type == message_module.PossibleRequestTypesFromFollower.ACK_MESSAGE.value:
+                        follower_PEL = PEL[message.sender_member_name]
+                        message_id_to_delete = message.message_body
+                        for message in follower_PEL.copy():
+                            if message.id == message_id_to_delete:
+                                follower_PEL.remove(message)
+                        LOGGER.debug(f'сообщений с id: {message_id_to_delete} было удалено из PEL подписчика')
             except exceptions.ConnectionToFollowerHasLost:
                 break
 

@@ -6,7 +6,7 @@ from ..bind import Bind
 from ..connection import Connection
 from ..logger_conf import LOGGER
 from ..member import BaseMember
-from ..message.message_factory import MessageFromPublisherFactory
+from ..message_package.message_factory import MessageFromPublisherFactory
 
 
 class IPublisher:
