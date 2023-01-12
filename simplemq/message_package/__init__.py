@@ -1,2 +1,3 @@
 from .convert_request_message_to_server_message import convert_request_message_to_server_message
+from .convert_message_to_bytes import convert_message_to_bytes
 from .deserializer import message_deserializer

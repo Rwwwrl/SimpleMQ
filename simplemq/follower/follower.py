@@ -9,7 +9,7 @@ from ..connection import Connection
 from ..logger_conf import LOGGER
 from ..member import BaseMember
 from ..message_package.deserializer import message_deserializer
-from ..message_package.message import MessageFromServer
+from ..message_package.message_classes import MessageFromServer
 from ..message_package.message_factory import MessageFromFollowerFactory
 
 

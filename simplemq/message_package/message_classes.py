@@ -5,7 +5,6 @@ from enum import Enum
 from typing import Optional, TYPE_CHECKING, Union
 
 from .. import mixins
-from ..utils.static_funcs import dataclass_to_bytes
 
 if TYPE_CHECKING:
     from .. import hints
@@ -64,7 +63,8 @@ class IMessageFromMember(IMessage):
 
     @property
     def as_bytes(self) -> bytes:
-        return dataclass_to_bytes(self)
+        from .convert_message_to_bytes import convert_message_to_bytes
+        return convert_message_to_bytes(self)
 
 
 @dataclass(kw_only=True)
@@ -89,7 +89,8 @@ class MessageFromServer(IMessage):
 
     @property
     def as_bytes(self) -> bytes:
-        return dataclass_to_bytes(self)
+        from .convert_message_to_bytes import convert_message_to_bytes
+        return convert_message_to_bytes(self)
 
 
 @dataclass(kw_only=True)
@@ -99,4 +100,5 @@ class MessageFromCursor(IMessage):
 
     @property
     def as_bytes(self) -> bytes:
-        return dataclass_to_bytes(self)
+        from .convert_message_to_bytes import convert_message_to_bytes
+        return convert_message_to_bytes(self)

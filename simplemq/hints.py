@@ -1,6 +1,6 @@
 from typing import Any, Deque, Dict, NewType
 
-from .message_package.message import MessageFromServer
+from .message_package.message_classes import MessageFromServer
 
 MessageBody = NewType('MessageBody', Any)
 MemberName = NewType('MemberName', str)

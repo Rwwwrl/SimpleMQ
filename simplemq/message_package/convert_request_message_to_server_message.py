@@ -1,6 +1,6 @@
 from typing import Union
 
-from .message import MessageFromFollower, MessageFromPublisher, MessageFromServer
+from .message_classes import MessageFromFollower, MessageFromPublisher, MessageFromServer
 from .message_factory import MessageFromServerFactory
 
 

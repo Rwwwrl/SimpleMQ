@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from . import hints
 from .adapters import socket
-from .message_package import message, message_factory
+from .message_package import message_classes, message_factory
 
 
 @dataclass
@@ -42,7 +42,7 @@ class Cursor:
         message_to_create_new_stream = self.message_factory.create_message_to_create_stream(stream_name=stream_name)
         self._send_message(message_from_cursor=message_to_create_new_stream)
 
-    def _send_message(self, message_from_cursor: message.MessageFromCursor) -> None:
+    def _send_message(self, message_from_cursor: message_classes.MessageFromCursor) -> None:
         self.socket = socket.BuildInBasedSocket()
         self.socket.connect(self.connection.host, self.connection.port)
         self.socket.send_message(message_from_cursor.as_bytes)

@@ -11,7 +11,7 @@ from .data import PEL, STREAMS
 from .stream_writer_wrapper import StreamWriterWrapper
 from ..logger_conf import LOGGER
 from ..message_package import convert_request_message_to_server_message
-from ..message_package import message as message_module
+from ..message_package import message_classes as message_module
 
 
 def get_method_by_request_type(instance: IHandler, request_type: message_module.PossibleRequestType) -> Callable:

@@ -6,7 +6,7 @@ from .request_type_handlers import (
     HandlerMessagesFromPublisher,
     IHandler,
 )
-from ..message_package.message import PossibleSenderTypes
+from ..message_package.message_classes import PossibleSenderTypes
 
 
 class DispatcherBySenderType:
