@@ -1,9 +1,13 @@
-from dataclasses import dataclass
+from __future__ import annotations
 
-from .hints import RouteString
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from . import hints
 
 
 @dataclass
 class Bind:
 
-    route_string: RouteString
+    route_string: hints.RouteString

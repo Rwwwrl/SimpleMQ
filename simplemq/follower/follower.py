@@ -74,7 +74,7 @@ class BaseFollower(BaseMember, IFollower):
     def _deserialize_message_from_server(self, message_from_server: bytes) -> MessageFromServer:
         return message_deserializer(message_from_server)
 
-    def get_messages(self) -> Iterator[MessageFromServer]:
+    def get_messages(self, auto_ack: bool = False) -> Iterator[MessageFromServer]:
         message_to_get_new_message = self._message_factory.create_give_me_new_message()
         while self.is_connected:
             LOGGER.debug(f'подписчик: {self.member_name} запросил новое сообщение')
@@ -88,9 +88,10 @@ class BaseFollower(BaseMember, IFollower):
 
             LOGGER.debug(f'подписчик: {self.member_name} получил новое сообщение')
             message = self._deserialize_message_from_server(message_from_server=message)
-            if message:
-                LOGGER.debug('сообщение от сервера было получено')
-                yield message
+            LOGGER.debug('сообщение от сервера было получено')
+            if auto_ack:
+                self.ack_message(message_from_server=message)
+            yield message
         self.close_connection()
 
     def ack_message(self, message_from_server: MessageFromServer) -> None:

@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from . import id_generator, message
-from .. import hints
 from ..bind import Bind
+
+if TYPE_CHECKING:
+    from .. import hints
 
 
 class MessageFromFollowerFactory:

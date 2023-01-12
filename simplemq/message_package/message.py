@@ -13,32 +13,37 @@ if TYPE_CHECKING:
 
 class PossibleSenderTypes(Enum):
 
-    FOLLOWER = 'follower'
-    PUBLISHER = 'publisher'
-    SERVER = 'server'
-    CURSOR = 'cursor'
+    FOLLOWER = 'FOLLOWER'
+    PUBLISHER = 'PUBLISHER'
+    SERVER = 'SERVER'
+    CURSOR = 'CURSOR'
 
 
-class PossibleRequestTypesFromPublisher(Enum):
-
-    NEW_MESSAGE = 'new_message'
-
-
-class PossibleRequestTypesFromFollower(Enum):
-
-    NEW_MESSAGE = 'new_message'
-    GIVE_ME_NEW_MESSAGE = 'give_me_new_message'
-    ACK_MESSAGE = 'ack_message'
+class PossibleRequestType(Enum):
+    # для аннотации
+    pass
 
 
-class PossibleRequestTypesFromServer(Enum):
+class PossibleRequestTypesFromPublisher(PossibleRequestType):
 
-    NEW_MESSAGE_TO_FOLLOWER = 'new_message_to_follower'
+    NEW_MESSAGE = 'NEW_MESSAGE'
 
 
-class PossibleRequestTypesFromCursor(Enum):
+class PossibleRequestTypesFromFollower(PossibleRequestType):
 
-    CREATE_STREAM = 'create_stream'
+    NEW_MESSAGE = 'NEW_MESSAGE'
+    GIVE_ME_NEW_MESSAGE = 'GIVE_ME_NEW_MESSAGE'
+    ACK_MESSAGE = 'ACK_MESSAGE'
+
+
+class PossibleRequestTypesFromServer(PossibleRequestType):
+
+    NEW_MESSAGE_TO_FOLLOWER = 'NEW_MESSAGE_TO_FOLLOWER'
+
+
+class PossibleRequestTypesFromCursor(PossibleRequestType):
+
+    CREATE_STREAM = 'CREATE_STREAM'
 
 
 RequestTypesFromMember = Union[PossibleRequestTypesFromPublisher, PossibleRequestTypesFromFollower]
