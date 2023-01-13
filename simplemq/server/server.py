@@ -42,7 +42,7 @@ class Server:
 
     async def client_connected_cb(self, reader: StreamReader, writer: StreamWriter) -> None:
         connection_uid = str(uuid.uuid4())[:8]
-        LOGGER.debug(f'Новой подключение, connection_uid: {connection_uid}')
+        LOGGER.debug(f'Новоe подключение, connection_uid: {connection_uid}')
         while True:
             try:
                 try:

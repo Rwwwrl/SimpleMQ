@@ -2,6 +2,7 @@ import json
 from typing import Union
 
 from . import message_classes as message_module
+from ..bind import Bind, BindTypes
 
 PossibleMessages = Union[message_module.MessageFromCursor, message_module.MessageFromFollower,
                          message_module.MessageFromPublisher, message_module.MessageFromServer]
@@ -17,7 +18,10 @@ def message_deserializer(message: bytes) -> PossibleMessages:
             sender_member_name=message_as_json['sender_member_name'],
             request_type=message_module.PossibleRequestTypesFromFollower[request_type],
             message_body=message_as_json['message_body'],
-            route_string=message_as_json['route_string'],
+            bind=Bind(
+                route_string=message_as_json['bind']['route_string'],
+                bind_type=BindTypes[message_as_json['bind']['bind_type']],
+            ),
         )
 
     if sender_type == message_module.PossibleSenderTypes.PUBLISHER:
@@ -26,7 +30,10 @@ def message_deserializer(message: bytes) -> PossibleMessages:
             sender_member_name=message_as_json['sender_member_name'],
             request_type=message_module.PossibleRequestTypesFromPublisher[request_type],
             message_body=message_as_json['message_body'],
-            route_string=message_as_json['route_string'],
+            bind=Bind(
+                route_string=message_as_json['bind']['route_string'],
+                bind_type=BindTypes[message_as_json['bind']['bind_type']],
+            ),
         )
 
     if sender_type == message_module.PossibleSenderTypes.SERVER:

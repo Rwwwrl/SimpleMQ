@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Optional, TYPE_CHECKING, Union
 
 from .. import mixins
+from ..bind import Bind
 
 if TYPE_CHECKING:
     from .. import hints
@@ -43,6 +44,10 @@ class PossibleRequestTypesFromServer(PossibleRequestType):
 class PossibleRequestTypesFromCursor(PossibleRequestType):
 
     CREATE_STREAM = 'CREATE_STREAM'
+    GET_STREAM = 'GET_STREAM'
+    GET_STREAMS = 'GET_STREAMS'
+    GET_PEL = 'GET_PEL'
+    GET_PELS = 'GET_PELS'
 
 
 RequestTypesFromMember = Union[PossibleRequestTypesFromPublisher, PossibleRequestTypesFromFollower]
@@ -59,7 +64,7 @@ class IMessage(mixins.ForwardedObject):
 class IMessageFromMember(IMessage):
 
     sender_member_name: hints.MemberName
-    route_string: hints.RouteString
+    bind: Bind
 
     @property
     def as_bytes(self) -> bytes:

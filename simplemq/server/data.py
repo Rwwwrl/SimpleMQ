@@ -1,4 +1,4 @@
 from .. import hints
 
 STREAMS = hints.Streams({})
-PEL = hints.PEL({})
+PELS = hints.PELS({})

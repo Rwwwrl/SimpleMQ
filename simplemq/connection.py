@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from typing import Dict, List
 
 from . import hints
 from .adapters import socket
-from .message_package import message_classes, message_factory
+from .message_package import message_factory
 
 
 @dataclass
@@ -37,14 +39,32 @@ class Cursor:
     def __init__(self, connection: Connection):
         self.connection = connection
         self.message_factory = message_factory.MessageFromCursorFactory
+        self.socket = socket.BuildInBasedSocket()
+
+    def open_connection(self) -> None:
+        self.socket.connect(self.connection.host, self.connection.port)
+
+    def close_connection(self) -> None:
+        self.socket.close()
 
     def create_stream(self, stream_name: hints.StreamName) -> None:
         message_to_create_new_stream = self.message_factory.create_message_to_create_stream(stream_name=stream_name)
-        self._send_message(message_from_cursor=message_to_create_new_stream)
+        self.socket.send_message(message_to_create_new_stream.as_bytes)
 
-    def _send_message(self, message_from_cursor: message_classes.MessageFromCursor) -> None:
-        self.socket = socket.BuildInBasedSocket()
-        self.socket.connect(self.connection.host, self.connection.port)
-        self.socket.send_message(message_from_cursor.as_bytes)
-        self.socket.close()
-        del self.socket
+    def get_STREAMS(self) -> Dict[hints.StreamName, List[Dict]]:
+        mesasage_to_get_streams = self.message_factory.create_message_to_get_STREAMS()
+        self.socket.send_message(mesasage_to_get_streams.as_bytes)
+        answer = self.socket.recv().decode('utf-8')
+        return json.loads(answer)['message_body']
+
+    def get_STREAM(self, stream_name: hints.StreamName) -> hints.Streams:
+        # TODO реализовать
+        pass
+
+    def get_PELS(self) -> hints.PELS:
+        # TODO реализовать
+        pass
+
+    def get_PEL(self, follower_name: hints.FollowerName) -> hints.PEL:
+        # TODO реализовать
+        pass
