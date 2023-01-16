@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, TYPE_CHECKING
 
 from . import hints
 from .adapters import socket
 from .message_package import message_factory
+
+if TYPE_CHECKING:
+    from .member import MemberWithPersistentConnectionProtocol
 
 
 @dataclass
@@ -47,6 +50,9 @@ class Cursor:
     def close_connection(self) -> None:
         self.socket.close()
 
+    def session(self) -> Session:
+        return Session(member_with_persistent_connection=self)
+
     def create_stream(self, stream_name: hints.StreamName) -> None:
         message_to_create_new_stream = self.message_factory.create_message_to_create_stream(stream_name=stream_name)
         self.socket.send_message(message_to_create_new_stream.as_bytes)
@@ -68,3 +74,14 @@ class Cursor:
     def get_PEL(self, follower_name: hints.FollowerName) -> hints.PEL:
         # TODO реализовать
         pass
+
+
+class Session:
+    def __init__(self, member_with_persistent_connection: MemberWithPersistentConnectionProtocol):
+        self.member_with_persistent_connection = member_with_persistent_connection
+
+    def __enter__(self) -> None:
+        self.member_with_persistent_connection.open_connection()
+
+    def __exit__(self, *args, **kwargs) -> None:
+        self.member_with_persistent_connection.close_connection()

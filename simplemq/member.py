@@ -1,6 +1,6 @@
 import abc
 import uuid
-from typing import Optional
+from typing import Optional, Protocol
 
 from .connection import Connection
 from .hints import MemberName
@@ -18,6 +18,14 @@ class IMember(abc.ABC):
     @abc.abstractproperty
     def connection(self) -> Connection:
         pass
+
+
+class MemberWithPersistentConnectionProtocol(Protocol):
+    def open_connection(self) -> None:
+        ...
+
+    def close_connection(slef) -> None:
+        ...
 
 
 class BaseMember(IMember):

@@ -5,7 +5,7 @@ from typing import Iterator, Optional
 from .. import hints
 from ..adapters import socket
 from ..bind import Bind
-from ..connection import Connection
+from ..connection import Connection, Session
 from ..logger_conf import LOGGER
 from ..member import BaseMember
 from ..message_package.deserializer import message_deserializer
@@ -66,6 +66,9 @@ class BaseFollower(BaseMember, IFollower):
             return
         self.socket.close()
         LOGGER.debug(f'подписчик: "{self.member_name}" был отключен')
+
+    def session(self) -> Session:
+        return Session(member_with_persistent_connection=self)
 
     @property
     def is_connected(self) -> bool:
