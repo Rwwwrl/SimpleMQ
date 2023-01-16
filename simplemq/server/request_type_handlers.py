@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import abc
 import asyncio
-import itertools
 import re
 from asyncio.streams import StreamWriter
 from collections import deque
-from typing import Callable, Iterator
+from typing import Callable, Iterator, List
 
 from . import exceptions
 from .data import PELS, STREAMS
@@ -16,6 +15,19 @@ from ..bind import BindTypes
 from ..logger_conf import LOGGER
 from ..message_package import convert_message_to_json, create_server_message
 from ..message_package import message_classes as message_module
+
+
+def get_streams(message: message_module.MessageFromFollower) -> List[hints.Stream]:
+    if message.bind.bind_type == BindTypes.DIRECT:
+        stream_name = message.bind.route_string
+        try:
+            streams = [STREAMS[stream_name]]
+        except KeyError:
+            return []
+        else:
+            return streams
+    if message.bind.bind_type == BindTypes.REGEX_BASED:
+        return streams_iterator(routing_string=message.bind.route_string)
 
 
 def streams_iterator(routing_string: hints.RouteString) -> Iterator[hints.Stream]:
@@ -48,34 +60,34 @@ class HandlerMessagesFromFollower(BaseHandler):
         message: message_module.MessageFromFollower,
         writer: StreamWriter,
     ) -> None:
-        if message.bind.bind_type == BindTypes.DIRECT:
-            stream_name = message.bind.route_string
-            streams = [STREAMS[stream_name]]
-        if message.bind.bind_type == BindTypes.REGEX_BASED:
-            streams = streams_iterator(routing_string=message.bind.route_string)
-
         follower = StreamWriterWrapper(member_name=message.sender_member_name, stream_writer=writer)
-        for stream in itertools.cycle(streams):
-            try:
-                new_message = stream.popleft()
-            except IndexError:
-                await asyncio.sleep(0)
-            else:
+        while True:
+            streams = get_streams(message=message)
+            streams_are_empty = True
+            for stream in streams:
+                streams_are_empty = False
                 try:
-                    await self._send_message_to_follower(
-                        follower=follower,
-                        message_from_server=new_message,
-                    )
-                    PELS.setdefault(message.sender_member_name, hints.PEL(deque([])))
-                    PELS[message.sender_member_name].append(new_message)
-                except Exception as e:
-                    # если нам не удалось доставить сообщение по какой-либо причине,
-                    # то мы возвращаем его обратно в стрим
-                    stream.appendleft(new_message)
-                    LOGGER.error('Неизвестная ошибка')
-                    raise e
+                    new_message = stream.popleft()
+                except IndexError:
+                    await asyncio.sleep(0)
                 else:
-                    break
+                    try:
+                        await self._send_message_to_follower(
+                            follower=follower,
+                            message_from_server=new_message,
+                        )
+                        PELS.setdefault(message.sender_member_name, hints.PEL(deque([])))
+                        PELS[message.sender_member_name].append(new_message)
+                    except Exception as e:
+                        # если нам не удалось доставить сообщение по какой-либо причине,
+                        # то мы возвращаем его обратно в стрим
+                        stream.appendleft(new_message)
+                        LOGGER.error('Неизвестная ошибка')
+                        raise e
+                    else:
+                        break
+            if streams_are_empty:
+                await asyncio.sleep(0)
 
     async def handle__ack_message(self, message: message_module.MessageFromFollower, writer: StreamWriter) -> None:
         follower_PEL = PELS[message.sender_member_name]
