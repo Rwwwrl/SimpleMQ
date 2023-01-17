@@ -54,7 +54,7 @@ RequestTypesFromMember = Union[PossibleRequestTypesFromPublisher, PossibleReques
 
 
 @dataclass(kw_only=True)
-class IMessage(mixins.ForwardedObject):
+class IMessage(mixins.ForwardedObjectMixin):
     sender_type: PossibleSenderTypes = None
     request_type: RequestTypesFromMember
     message_body: Optional[hints.MessageBody]

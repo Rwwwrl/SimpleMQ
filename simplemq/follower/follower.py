@@ -1,8 +1,7 @@
 import abc
-import signal
 from typing import Iterator, Optional
 
-from .. import hints
+from .. import hints, mixins
 from ..adapters import socket
 from ..bind import Bind
 from ..connection import Connection, Session
@@ -35,7 +34,7 @@ class IFollower(abc.ABC):
         pass
 
 
-class BaseFollower(BaseMember, IFollower):
+class BaseFollower(BaseMember, IFollower, mixins.GracefullyExitMixin):
     def __init__(
         self,
         connection: Connection,
@@ -44,8 +43,6 @@ class BaseFollower(BaseMember, IFollower):
     ):
         super().__init__(member_name=member_name, connection=connection)
         self._message_factory = MessageFromFollowerFactory(sender_member_name=self.member_name, bind=bind)
-        signal.signal(signal.SIGINT, self.close_connection_on_sigterm)
-        signal.signal(signal.SIGTERM, self.close_connection_on_sigterm)
 
     @property
     def socket(self) -> socket.BuildInBasedSocket:
@@ -58,7 +55,7 @@ class BaseFollower(BaseMember, IFollower):
         self._socket = socket.BuildInBasedSocket()
         self.socket.connect(host=self.connection.host, port=self.connection.port)
 
-    def close_connection_on_sigterm(self, *args) -> None:
+    def gracefully_exit(self):
         self.close_connection()
 
     def close_connection(self) -> None:
