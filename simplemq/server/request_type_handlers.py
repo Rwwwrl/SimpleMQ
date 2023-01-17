@@ -61,7 +61,8 @@ class HandlerMessagesFromFollower(BaseHandler):
         writer: StreamWriter,
     ) -> None:
         follower = StreamWriterWrapper(member_name=message.sender_member_name, stream_writer=writer)
-        while True:
+        message_to_follower_have_delivered = False
+        while not message_to_follower_have_delivered:
             streams = get_streams(message=message)
             streams_are_empty = True
             for stream in streams:
@@ -76,6 +77,7 @@ class HandlerMessagesFromFollower(BaseHandler):
                             follower=follower,
                             message_from_server=new_message,
                         )
+                        message_to_follower_have_delivered = True
                         PELS.setdefault(message.sender_member_name, hints.PEL(deque([])))
                         PELS[message.sender_member_name].append(new_message)
                     except Exception as e:
@@ -95,7 +97,7 @@ class HandlerMessagesFromFollower(BaseHandler):
         for message in follower_PEL.copy():
             if message.id == message_id_to_delete:
                 follower_PEL.remove(message)
-        LOGGER.debug(f'обработка сообщения с id: {message_id_to_delete} была подтвеждена')
+        LOGGER.debug(f'Обработка сообщения с id: {message_id_to_delete} была подтвеждена')
 
     async def _send_message_to_follower(
         self,
