@@ -34,7 +34,7 @@ class IFollower(abc.ABC):
         pass
 
 
-class BaseFollower(BaseMember, IFollower, mixins.GracefullyExitMixin):
+class Follower(BaseMember, IFollower, mixins.GracefullyExitMixin):
     def __init__(
         self,
         connection: Connection,

@@ -32,7 +32,7 @@ def get_streams(message: message_module.MessageFromFollower) -> List[hints.Strea
 
 def streams_iterator(routing_string: hints.RouteString) -> Iterator[hints.Stream]:
     pattern = re.compile(routing_string)
-    for stream_name in STREAMS.keys():
+    for stream_name in STREAMS.copy().keys():
         if re.search(pattern=pattern, string=stream_name):
             yield STREAMS[stream_name]
 

@@ -1,1 +1,1 @@
-from .follower import BaseFollower
+from .follower import Follower
