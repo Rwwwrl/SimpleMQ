@@ -3,6 +3,12 @@
 _SimpleMQ_ - простой _MQ_, написанный на питоне с использованием стримов из библиотеки **asyncio** для написания сервера
 и сокетов из библиотеки **socket** для реализации постоянного соединения сервер-подписчик
 
+## Setup
+
+`pip install asyncio-simple-mq`
+
+## Get Started
+
 1. [Hello world](#hello_world)
 2. [Worker](#worker)
 3. [Routing](#routing)
@@ -128,7 +134,7 @@ with follower.session():
         follower.ack_message(message)
 ```
 
-- передать True в аргумент auto_ack. В таком случае на сервер придет потверждение об обработке сообщения еще до вызова *handle_message*
+- передать True в аргумент auto_ack. В таком случае на сервер придет потверждение об обработке сообщения еще до вызова _handle_message_
 
 ```python
 with follower.session():

@@ -1,3 +1,5 @@
 from setuptools import setup
 
-setup()
+requirements = ["PyYAML"]
+
+setup(install_requires=requirements)
