@@ -5,33 +5,43 @@ import uuid
 from asyncio import exceptions as asyncio_exceptions
 from asyncio.base_events import Server as lib_Server
 from asyncio.streams import StreamReader, StreamWriter
+from dataclasses import dataclass
 
-from decouple import config
+import yaml
 
 from . import exceptions
 from .dispatcher_by_sender_type import DispatcherBySenderType
+from .. import hints
 from ..logger_conf import LOGGER
 from ..message_package.convert_message_to_bytes import END_OF_MESSAGE
 from ..message_package.deserializer import message_deserializer
 
 
+@dataclass
+class ServerConfigurationData:
+
+    host: hints.Host
+    port: hints.Port
+
+
 class Server:
     @classmethod
-    async def acreate(cls) -> Server:
+    async def acreate(cls, server_configuration_data: ServerConfigurationData) -> Server:
         self = cls()
-        self.HOST = config('SERVER_HOST')
-        self.PORT = int(config('SERVER_PORT'))
 
+        self.server_configuration_data = server_configuration_data
         self.server: lib_Server = await asyncio.start_server(
             client_connected_cb=self.safety_client_connect_cb,
-            host=self.HOST,
-            port=self.PORT,
+            host=self.server_configuration_data.host,
+            port=self.server_configuration_data.port,
         )
         return self
 
     async def run_server(self):
         async with self.server:
-            LOGGER.debug(f'сервер был запущен на {self.HOST}:{self.PORT}')
+            LOGGER.debug(
+                f'сервер был запущен на {self.server_configuration_data.host}:{self.server_configuration_data.port}',
+            )
             await self.server.serve_forever()
 
     async def safety_client_connect_cb(self, reader: StreamReader, writer: StreamWriter) -> None:
@@ -77,11 +87,13 @@ class Server:
         await writer.wait_closed()
 
 
-async def _run_server():
+async def _run_server(server_configuration_data: ServerConfigurationData):
 
-    server = await Server.acreate()
+    server = await Server.acreate(server_configuration_data=server_configuration_data)
     await server.run_server()
 
 
-def run_server():
-    asyncio.run(_run_server())
+def run_server(settings_yml_filepath: str):
+    with open(settings_yml_filepath, "r") as stream:
+        server_configuration_data = ServerConfigurationData(**yaml.safe_load(stream))
+    asyncio.run(_run_server(server_configuration_data))
