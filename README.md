@@ -134,7 +134,7 @@ with follower.session():
         follower.ack_message(message)
 ```
 
-- передать True в аргумент auto_ack. В таком случае на сервер придет потверждение об обработке сообщения еще до вызова _handle_message_
+- передать True в аргумент auto*ack. В таком случае на сервер придет потверждение об обработке сообщения еще до вызова \_handle_message*
 
 ```python
 with follower.session():
@@ -229,8 +229,8 @@ with follower.session():
 - _Direct_ - режим по умолчанию, который мы использовали раньше. Издатель отправляет сообщения в стрим с наименованием равным значению аргумента _routing_key_. Подписчик читает сообщения из стрима с наименованием равным значению аргумента _routing_key_.
 - _REGEX_BASED_ - Издатель отправляет сообщения во все стримы, название которых удовлетворяет regex выражению из _routing_key_. Подписчик читает сообщения из всех стримов, название которых содержит удовлетворяет regex выражению из _routing_key_.
 
-1. RegexBased Routing cо стороны издателя
-   ![alt](static/images/routing_publisher.png)
+**RegexBased Routing** cо стороны издателя:
+![alt](static/images/routing_publisher.png)
 
 ```python
 # publisher
@@ -332,8 +332,8 @@ with follower.session():
 **Демонстрация работы:**
 ![alt](static/gifs/routing_publisher.gif)
 
-2. RegexBased Routing cо стороны подписчика
-   ![alt](static/images/routing_follower.png)
+**RegexBased** Routing cо стороны подписчика
+![alt](static/images/routing_follower.png)
 
 ```python
 # first_publisher.py
