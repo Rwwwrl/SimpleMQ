@@ -139,20 +139,46 @@ class HandlerMessagesFromCursor(BaseHandler):
             STREAMS[stream_name] = deque([])
             LOGGER.debug(f'был создан новый стрим с наименованием: {stream_name}')
 
-    async def handle__get_pels(self, message: message_module.MessageFromCursor, writer: StreamWriter) -> None:
-        json_serializable_pels = {}
-        for member_name, pel in PELS:
-            json_serializable_pels[member_name] = [convert_message_to_json(m) for m in pel]
-
-        message_from_server = create_server_message(message_body=json_serializable_pels)
-        writer.write(message_from_server.as_bytes)
-        await writer.drain()
-
     async def handle__get_streams(self, message: message_module.MessageFromCursor, writer: StreamWriter) -> None:
         json_serializable_streams = {}
         for stream_name, stream in STREAMS.items():
             json_serializable_streams[stream_name] = [convert_message_to_json(m) for m in stream]
 
         message_from_server = create_server_message(message_body=json_serializable_streams)
+        writer.write(message_from_server.as_bytes)
+        await writer.drain()
+
+    async def handle__get_stream(self, message: message_module.MessageFromCursor, writer: StreamWriter) -> None:
+        stream_name = message.message_body
+        try:
+            stream = STREAMS[stream_name]
+        except KeyError:
+            answer_body = 'Стрима с таким наименованием не существует'
+        else:
+            answer_body = [convert_message_to_json(m) for m in stream]
+
+        message_from_server = create_server_message(message_body=answer_body)
+        writer.write(message_from_server.as_bytes)
+        await writer.drain()
+
+    async def handle__get_pels(self, message: message_module.MessageFromCursor, writer: StreamWriter) -> None:
+        json_serializable_pels = {}
+        for member_name, pel in PELS.items():
+            json_serializable_pels[member_name] = [convert_message_to_json(m) for m in pel]
+
+        message_from_server = create_server_message(message_body=json_serializable_pels)
+        writer.write(message_from_server.as_bytes)
+        await writer.drain()
+
+    async def handle__get_pel(self, message: message_module.MessageFromCursor, writer: StreamWriter) -> None:
+        follower_name = message.message_body
+        try:
+            pel = PELS[follower_name]
+        except KeyError:
+            answer_body = 'PEL для этого подписчика нет'
+        else:
+            answer_body = [convert_message_to_json(m) for m in pel]
+
+        message_from_server = create_server_message(message_body=answer_body)
         writer.write(message_from_server.as_bytes)
         await writer.drain()

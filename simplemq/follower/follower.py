@@ -39,7 +39,7 @@ class Follower(BaseMember, IFollower, mixins.GracefullyExitMixin):
         self,
         connection: Connection,
         bind: Bind,
-        member_name: Optional[hints.MemberName] = None,
+        member_name: Optional[hints.FollowerName] = None,
     ):
         super().__init__(member_name=member_name, connection=connection)
         self._message_factory = MessageFromFollowerFactory(sender_member_name=self.member_name, bind=bind)

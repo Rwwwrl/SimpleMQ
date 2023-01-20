@@ -1,4 +1,4 @@
-from typing import Any, Deque, Dict, NewType
+from typing import Any, Deque, Dict, List, NewType
 
 from .message_package.message_classes import MessageFromServer
 
@@ -13,7 +13,9 @@ StreamName = NewType('StreamName', str)
 Stream = NewType('Stream', Deque[MessageFromServer])
 Streams = NewType('Streams', Dict[StreamName, Stream])
 PEL = NewType('PEL', Deque[MessageFromServer])
-PELS = NewType('PEL', Dict[MemberName, PEL])
+PELS = NewType('PEL', Dict[FollowerName, PEL])
 
 Host = NewType('Host', str)
 Port = NewType('Port', int)
+
+MessagesFromServerAsJson = List[dict]

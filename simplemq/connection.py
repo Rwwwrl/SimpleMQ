@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Dict, List, TYPE_CHECKING
+from typing import Dict, TYPE_CHECKING
 
 from . import hints
 from .adapters import socket
 from .message_package import message_factory
+from .message_package.message_classes import MessageFromCursor
 
 if TYPE_CHECKING:
     from .member import MemberWithPersistentConnectionProtocol
@@ -57,23 +58,26 @@ class Cursor:
         message_to_create_new_stream = self.message_factory.create_message_to_create_stream(stream_name=stream_name)
         self.socket.send_message(message_to_create_new_stream.as_bytes)
 
-    def get_STREAMS(self) -> Dict[hints.StreamName, List[Dict]]:
-        mesasage_to_get_streams = self.message_factory.create_message_to_get_STREAMS()
-        self.socket.send_message(mesasage_to_get_streams.as_bytes)
+    def _send_message_and_parse_answer(self, message: MessageFromCursor):
+        self.socket.send_message(message.as_bytes)
         answer = self.socket.recv().decode('utf-8')
         return json.loads(answer)['message_body']
 
-    def get_STREAM(self, stream_name: hints.StreamName) -> hints.Streams:
-        # TODO реализовать
-        pass
+    def get_STREAMS(self) -> Dict[hints.StreamName, hints.MessagesFromServerAsJson]:
+        message = self.message_factory.create_message_to_get_STREAMS()
+        return self._send_message_and_parse_answer(message=message)
 
-    def get_PELS(self) -> hints.PELS:
-        # TODO реализовать
-        pass
+    def get_STREAM(self, stream_name: hints.StreamName) -> hints.MessagesFromServerAsJson:
+        message = self.message_factory.create_message_to_get_STREAM(stream_name=stream_name)
+        return self._send_message_and_parse_answer(message=message)
 
-    def get_PEL(self, follower_name: hints.FollowerName) -> hints.PEL:
-        # TODO реализовать
-        pass
+    def get_PELS(self) -> Dict[hints.FollowerName, hints.MessagesFromServerAsJson]:
+        message = self.message_factory.create_message_to_get_PELS()
+        return self._send_message_and_parse_answer(message=message)
+
+    def get_PEL(self, follower_name: hints.FollowerName) -> hints.MessagesFromServerAsJson:
+        message = self.message_factory.create_message_to_get_PEL(follower_name=follower_name)
+        return self._send_message_and_parse_answer(message=message)
 
 
 class Session:
