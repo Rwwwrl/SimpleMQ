@@ -2,10 +2,15 @@ import json
 from typing import Union
 
 from . import message_classes as message_module
+from .. import hints
 from ..bind import Bind, BindTypes
 
 PossibleMessages = Union[message_module.MessageFromCursor, message_module.MessageFromFollower,
                          message_module.MessageFromPublisher, message_module.MessageFromServer]
+
+
+class InvalidSenderType(BaseException):
+    pass
 
 
 def message_deserializer(message: bytes) -> PossibleMessages:
@@ -39,7 +44,7 @@ def message_deserializer(message: bytes) -> PossibleMessages:
     if sender_type == message_module.PossibleSenderTypes.SERVER:
         request_type = message_as_json['request_type']
         return message_module.MessageFromServer(
-            id=int(message_as_json['id']),
+            id=hints.MessageId(message_as_json['id']),
             message_body=message_as_json['message_body'],
             request_type=message_module.PossibleRequestTypesFromServer[request_type],
         )
@@ -50,3 +55,5 @@ def message_deserializer(message: bytes) -> PossibleMessages:
             message_body=message_as_json['message_body'],
             request_type=message_module.PossibleRequestTypesFromCursor[request_type],
         )
+
+    raise InvalidSenderType

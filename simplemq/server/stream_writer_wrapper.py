@@ -1,7 +1,7 @@
+from asyncio.streams import StreamWriter
 from dataclasses import dataclass
 
 from ..hints import MemberName
-from asyncio.streams import StreamWriter
 
 
 @dataclass

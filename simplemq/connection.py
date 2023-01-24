@@ -60,7 +60,7 @@ class Cursor:
 
     def _send_message_and_parse_answer(self, message: MessageFromCursor):
         self.socket.send_message(message.as_bytes)
-        answer = self.socket.recv().decode('utf-8')
+        answer = self.socket.read().decode('utf-8')
         return json.loads(answer)['message_body']
 
     def get_STREAMS(self) -> Dict[hints.StreamName, hints.MessagesFromServerAsJson]:

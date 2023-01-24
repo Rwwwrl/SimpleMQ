@@ -80,7 +80,7 @@ class Follower(BaseMember, IFollower, mixins.GracefullyExitMixin):
             LOGGER.debug(f'подписчик: {self.member_name} запросил новое сообщение')
             self.socket.send_message(message_to_get_new_message.as_bytes)
             try:
-                message = self.socket.recv()
+                message = self.socket.read()
             except OSError:
                 continue
             if not message:

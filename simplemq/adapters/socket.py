@@ -12,7 +12,7 @@ class ISocket(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def recv(self) -> bytes:
+    def read(self, n: int) -> bytes:
         pass
 
     @abc.abstractmethod
@@ -42,7 +42,7 @@ class BuildInBasedSocket(ISocket):
     def send_message(self, message: bytes) -> None:
         self._sock.send(message)
 
-    def recv(self) -> bytes:
+    def read(self, n: int = BUFF_SIZE) -> bytes:
         return self._sock.recv(BUFF_SIZE)
 
     def connect(self, host: hints.Host, port: hints.Port) -> None:

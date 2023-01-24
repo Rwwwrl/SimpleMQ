@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional, TYPE_CHECKING, Union
 
@@ -55,8 +55,8 @@ RequestTypesFromMember = Union[PossibleRequestTypesFromPublisher, PossibleReques
 
 @dataclass(kw_only=True)
 class IMessage(mixins.ForwardedObjectMixin):
-    sender_type: PossibleSenderTypes = None
-    request_type: RequestTypesFromMember
+    sender_type: PossibleSenderTypes = field(init=False)
+    request_type: PossibleRequestType
     message_body: Optional[hints.MessageBody]
 
 
