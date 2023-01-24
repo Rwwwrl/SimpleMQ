@@ -27,10 +27,12 @@ _SimpleMQ_ - простой _MQ_, написанный на питоне с ис
 ```yaml
 host:
 port:
+log_level:
 
 # пример
 host: localhost
 port: 9090
+log_level: 'WARNING'
 ```
 
 2. Создаем server.py
@@ -53,6 +55,10 @@ if __name__ == '__main__':
 from simplemq.follower import Follower
 from simplemq.bind import Bind
 from simplemq.connection import Connection, ConnectionConfig
+from simplemq.logger_conf import LOGGER
+
+# если хотим изменить значение log_level у логгера, по умолчанию - DEBUG
+LOGGER.setLevel('WARNING')
 
 connection_config = ConnectionConfig(
     host='localhost',
@@ -91,6 +97,10 @@ with follower.session():
 from simplemq.publisher.publisher import SocketBasedPublisher
 from simplemq.bind import Bind
 from simplemq.connection import Connection, ConnectionConfig
+from simplemq.logger_conf import LOGGER
+
+# если хотим изменить значение log_level у логгера, по умолчанию - DEBUG
+LOGGER.setLevel('WARNING')
 
 connection_config = ConnectionConfig(
     host='localhost',

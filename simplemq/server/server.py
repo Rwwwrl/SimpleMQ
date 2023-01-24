@@ -95,5 +95,25 @@ async def _run_server(server_configuration_data: ServerConfigurationData):
 
 def run_server(settings_yml_filepath: str):
     with open(settings_yml_filepath, "r") as stream:
-        server_configuration_data = ServerConfigurationData(**yaml.safe_load(stream))
+        conf_data = yaml.safe_load(stream)
+
+    server_configuration_data = ServerConfigurationData(
+        host=conf_data['host'],
+        port=conf_data['port'],
+    )
+    try:
+        LOGGER.setLevel(conf_data['log_level'])
+    except ValueError:
+        from logging import getLevelNamesMapping
+        LOGGER.warning(
+            f'''
+            Вы задали неверное значение для "log_level" в yaml файле, укажите одно из этих:
+            {list(getLevelNamesMapping().keys())}
+            ''',
+        )
+        LOGGER.setLevel('DEBUG')
+    except KeyError:
+        LOGGER.info('Вы не задачи значение "log_level" в yaml файле, будет использовано значение по умолчанию (DEBUG)')
+        LOGGER.setLevel('DEBUG')
+
     asyncio.run(_run_server(server_configuration_data))
